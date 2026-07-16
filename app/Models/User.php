@@ -30,4 +30,18 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function teacher()
+    {
+        return $this->hasOne(\App\Models\Teacher::class);
+    }
+    
+    public function student()
+    {
+        return $this->hasOne(\App\Models\Student::class);
+    }
+    
+    public function guardian()
+    {
+        return $this->hasOne(\App\Models\Guardian::class);
+    }
 }

@@ -5,35 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Kelaskita') }} — @yield('title', 'Dashboard')</title>
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-    <style>
-        body { min-height: 100vh; }
-        .sidebar {
-            width: 240px;
-            min-height: 100vh;
-            background-color: #212529;
-        }
-        .sidebar .nav-link { color: rgba(255, 255, 255, .75); }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: #fff;
-            background-color: rgba(255, 255, 255, .1);
-            border-radius: .375rem;
-        }
-        .main-content {
-            flex: 1;
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                z-index: 1040;
-                left: -240px;
-                transition: left .3s;
-            }
-            .sidebar.show { left: 0; }
-        }
-    </style>
+    @stack('styles')
 </head>
 <body>
     <div class="d-flex">
@@ -73,5 +45,6 @@
             </main>
         </div>
     </div>
+    @stack('scripts')
 </body>
 </html>

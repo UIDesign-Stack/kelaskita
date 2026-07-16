@@ -1,1 +1,99 @@
 @import "bootstrap/scss/bootstrap";
+
+body {
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: auto;
+    background-color: #212529;
+
+    .nav-link {
+        color: rgba(255, 255, 255, .75);
+        padding: .4rem .75rem;
+        font-size: .9rem;
+
+        &:hover,
+        &.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, .1);
+            border-radius: .375rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        position: fixed;
+        z-index: 1040;
+        left: -250px;
+        transition: left .3s;
+
+        &.show {
+            left: 0;
+        }
+    }
+}
+
+// ---------- Accordion Sidebar ----------
+.sidebar-accordion {
+    .sidebar-group {
+        margin-bottom: .15rem;
+    }
+
+    .sidebar-group-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: .55rem .75rem;
+        font-size: .85rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, .85);
+        text-decoration: none;
+        border-radius: .375rem;
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, .08);
+            color: #fff;
+        }
+
+        .chevron {
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid rgba(255, 255, 255, .6);
+            border-bottom: 2px solid rgba(255, 255, 255, .6);
+            transform: rotate(45deg);
+            transition: transform .2s ease;
+        }
+
+        // Saat submenu terbuka (Bootstrap menghapus class .collapsed)
+        &:not(.collapsed) .chevron {
+            transform: rotate(-135deg);
+        }
+    }
+
+    .collapse .nav {
+        padding-left: .75rem;
+        border-left: 1px solid rgba(255, 255, 255, .1);
+        margin-left: .9rem;
+        margin-top: .1rem;
+
+        .nav-link {
+            font-size: .82rem;
+            padding: .35rem .6rem;
+            color: rgba(255, 255, 255, .6);
+
+            &:hover {
+                color: #fff;
+            }
+        }
+    }
+}
+
+.main-content {
+    flex: 1;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
