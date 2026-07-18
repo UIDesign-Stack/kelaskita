@@ -17,6 +17,8 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
-        "axios": "^1.18.1"
+        "axios": "^1.18.1",
+        "bootstrap-icons": "^1.13.1",
+        "chart.js": "^4.5.1"
     }
 }

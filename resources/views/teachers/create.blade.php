@@ -13,27 +13,41 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form method="POST" action="{{ route('data-master.teachers.store') }}">
+            <form method="POST" action="{{ route('data-master.teachers.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <h6 class="text-muted mb-3">Data Diri</h6>
                 <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <label for="name" class="form-label">Nama Lengkap</label>
-                        <input type="text" id="name" name="name" value="{{ old('name') }}"
-                            class="form-control @error('name') is-invalid @enderror" required>
-                        @error('name')
+                    <div class="col-md-3">
+                        <label for="photo" class="form-label">Foto</label>
+                        <input type="file" id="photo" name="photo" accept="image/png, image/jpeg"
+                            class="form-control @error('photo') is-invalid @enderror">
+                        @error('photo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <div class="form-text">Format JPG/PNG, maksimal 2MB.</div>
                     </div>
 
-                    <div class="col-md-6">
-                        <label for="nuptk" class="form-label">NUPTK <span class="text-muted">(opsional)</span></label>
-                        <input type="text" id="nuptk" name="nuptk" value="{{ old('nuptk') }}"
-                            class="form-control @error('nuptk') is-invalid @enderror">
-                        @error('nuptk')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="col-md-9">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="name" class="form-label">Nama Lengkap</label>
+                                <input type="text" id="name" name="name" value="{{ old('name') }}"
+                                    class="form-control @error('name') is-invalid @enderror" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-4">
+                                <label for="nuptk" class="form-label">NUPTK <span class="text-muted">(opsional)</span></label>
+                                <input type="text" id="nuptk" name="nuptk" value="{{ old('nuptk') }}"
+                                    class="form-control @error('nuptk') is-invalid @enderror">
+                                @error('nuptk')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-12">

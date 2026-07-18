@@ -1,12 +1,14 @@
 <div class="sidebar text-white p-3">
-    <a href="{{ route('dashboard') }}" class="d-flex align-items-center mb-3 text-white text-decoration-none">
+    <a href="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 mb-3 text-white text-decoration-none">
+        <img src="{{ asset('images/logo.png') }}" alt="Kelaskita" class="sidebar-logo">
         <span class="fs-5 fw-bold">Kelaskita</span>
     </a>
 
     <ul class="nav nav-pills flex-column gap-1 mb-2">
         <li class="nav-item">
             <a href="{{ route('dashboard') }}"
-                class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                class="nav-link d-flex align-items-center gap-2 {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i>
                 Dashboard
             </a>
         </li>
@@ -179,15 +181,39 @@
                 ],
             ];
         }
+
+        // Mapping ikon untuk tiap judul grup menu (Bootstrap Icons)
+        $groupIcons = [
+            'Data Master' => 'bi-database',
+            'Akademik' => 'bi-journal-bookmark',
+            'Presensi' => 'bi-calendar2-check',
+            'Ujian & Evaluasi' => 'bi-clipboard2-check',
+            'Perilaku & Bimbingan' => 'bi-star',
+            'Administrasi' => 'bi-file-earmark-text',
+            'Keuangan' => 'bi-cash-coin',
+            'Komunikasi' => 'bi-chat-dots',
+            'Gamifikasi' => 'bi-trophy',
+            'Sistem' => 'bi-shield-lock',
+            'Kelas Saya' => 'bi-people',
+            'Perilaku' => 'bi-star',
+            'Perpustakaan' => 'bi-book',
+            'Pantau Anak' => 'bi-eye',
+        ];
     @endphp
 
     <div class="sidebar-accordion">
         @foreach ($menuGroups as $groupTitle => $items)
-            @php $groupId = 'menu-' . Str::slug($groupTitle); @endphp
+            @php
+                $groupId = 'menu-' . Str::slug($groupTitle);
+                $groupIcon = $groupIcons[$groupTitle] ?? 'bi-folder2';
+            @endphp
             <div class="sidebar-group">
                 <a href="#{{ $groupId }}" class="sidebar-group-toggle collapsed" data-bs-toggle="collapse"
                     role="button" aria-expanded="false" aria-controls="{{ $groupId }}">
-                    <span>{{ $groupTitle }}</span>
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi {{ $groupIcon }}"></i>
+                        {{ $groupTitle }}
+                    </span>
                     <i class="chevron"></i>
                 </a>
                 <div class="collapse" id="{{ $groupId }}">

@@ -30,6 +30,7 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'nis' => ['required', 'string', 'max:50', Rule::unique('students', 'nis')],
             'nisn' => ['nullable', 'string', 'max:50', Rule::unique('students', 'nisn')],
             'class_id' => ['required', 'exists:classes,id'],
@@ -59,9 +60,15 @@ class StudentController extends Controller
                 $userId = $user->id;
             }
 
+            $photoPath = null;
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('students', 'public');
+            }
+
             Student::create([
                 'user_id' => $userId,
                 'name' => $validated['name'],
+                'photo' => $photoPath,
                 'nis' => $validated['nis'],
                 'nisn' => $validated['nisn'] ?? null,
                 'class_id' => $validated['class_id'],

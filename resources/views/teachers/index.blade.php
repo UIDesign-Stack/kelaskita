@@ -21,6 +21,7 @@
                 <table id="teachers-table" class="table table-hover align-middle w-100">
                     <thead>
                         <tr>
+                            <th>Foto</th>
                             <th>NUPTK</th>
                             <th>Nama</th>
                             <th>Email</th>
@@ -32,6 +33,10 @@
                     <tbody>
                         @foreach ($teachers as $teacher)
                             <tr>
+                                <td>
+                                    <img src="{{ $teacher->photoUrl() }}" alt="{{ $teacher->user->name ?? 'Guru' }}"
+                                        class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                                </td>
                                 <td>{{ $teacher->nuptk ?? '-' }}</td>
                                 <td>{{ $teacher->user->name ?? '-' }}</td>
                                 <td>{{ $teacher->user->email ?? '-' }}</td>

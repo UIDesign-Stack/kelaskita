@@ -17,6 +17,7 @@
                 <table id="students-table" class="table table-hover align-middle w-100">
                     <thead>
                         <tr>
+                            <th>Foto</th>
                             <th>NIS</th>
                             <th>NISN</th>
                             <th>Nama</th>
@@ -29,6 +30,10 @@
                     <tbody>
                         @foreach ($students as $student)
                             <tr>
+                                <td>
+                                    <img src="{{ $student->photoUrl() }}" alt="{{ $student->name }}"
+                                        class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                                </td>
                                 <td>{{ $student->nis }}</td>
                                 <td>{{ $student->nisn ?? '-' }}</td>
                                 <td>{{ $student->name }}</td>

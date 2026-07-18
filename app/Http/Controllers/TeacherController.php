@@ -27,13 +27,14 @@ class TeacherController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'email' => ['required', 'email', Rule::unique('users', 'email')],
             'password' => ['required', 'min:8'],
             'nuptk' => ['nullable', 'string', 'max:50', Rule::unique('teachers', 'nuptk')],
             'specialization' => ['nullable', 'string', 'max:255'],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        DB::transaction(function () use ($validated, $request) {
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -43,9 +44,15 @@ class TeacherController extends Controller
 
             $user->assignRole('guru');
 
+            $photoPath = null;
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('teachers', 'public');
+            }
+
             Teacher::create([
                 'user_id' => $user->id,
                 'nuptk' => $validated['nuptk'] ?? null,
+                'photo' => $photoPath,
                 'specialization' => $validated['specialization'] ?? null,
             ]);
         });

@@ -1,4 +1,5 @@
 @import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 body {
     min-height: 100vh;
@@ -6,21 +7,39 @@ body {
 
 .sidebar {
     width: 250px;
-    min-height: 100vh;
-    max-height: 100vh;
+    height: 100vh;
+    position: sticky;
+    top: 0;
     overflow-y: auto;
-    background-color: #212529;
+    background: linear-gradient(180deg, #0041a9 0%, #027ca0 100%);
+
+    .sidebar-logo {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
 
     .nav-link {
         color: rgba(255, 255, 255, .75);
         padding: .4rem .75rem;
         font-size: .9rem;
 
+        i.bi {
+            font-size: .95rem;
+            width: 1.1rem;
+            text-align: center;
+            opacity: .85;
+        }
+
         &:hover,
         &.active {
             color: #fff;
             background-color: rgba(255, 255, 255, .1);
             border-radius: .375rem;
+
+            i.bi {
+                opacity: 1;
+            }
         }
     }
 
@@ -36,8 +55,12 @@ body {
     }
 }
 
-// ---------- Accordion Sidebar ----------
+// ======================================
+// Sidebar Accordion
+// ======================================
+
 .sidebar-accordion {
+
     .sidebar-group {
         margin-bottom: .15rem;
     }
@@ -54,9 +77,20 @@ body {
         border-radius: .375rem;
         cursor: pointer;
 
+        i.bi {
+            font-size: .95rem;
+            width: 1.1rem;
+            text-align: center;
+            opacity: .8;
+        }
+
         &:hover {
             background-color: rgba(255, 255, 255, .08);
             color: #fff;
+
+            i.bi {
+                opacity: 1;
+            }
         }
 
         .chevron {
@@ -68,32 +102,219 @@ body {
             transition: transform .2s ease;
         }
 
-        // Saat submenu terbuka (Bootstrap menghapus class .collapsed)
         &:not(.collapsed) .chevron {
             transform: rotate(-135deg);
         }
     }
 
-    .collapse .nav {
-        padding-left: .75rem;
-        border-left: 1px solid rgba(255, 255, 255, .1);
-        margin-left: .9rem;
-        margin-top: .1rem;
+    .collapse {
 
-        .nav-link {
-            font-size: .82rem;
-            padding: .35rem .6rem;
-            color: rgba(255, 255, 255, .6);
+        .nav {
+            padding-left: .75rem;
+            border-left: 1px solid rgba(255, 255, 255, .1);
+            margin-left: .9rem;
+            margin-top: .1rem;
 
-            &:hover {
-                color: #fff;
+            .nav-link {
+                font-size: .82rem;
+                padding: .35rem .6rem;
+                color: rgba(255, 255, 255, .6);
+
+                &:hover {
+                    color: #fff;
+                }
             }
         }
     }
 }
 
+// ======================================
+// Main Content
+// ======================================
+
 .main-content {
     flex: 1;
-    background-color: #f8f9fa;
     min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+// ======================================
+// Dashboard Widgets
+// ======================================
+
+.chart-box {
+    position: relative;
+    width: 100%;
+    min-height: 200px;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+// ======================================
+// Soft Background Utilities
+// ======================================
+
+.bg-soft-primary {
+    background-color: #e0edff;
+    color: #0041a9;
+}
+
+.bg-soft-success {
+    background-color: #e2f7ea;
+    color: #16a34a;
+}
+
+.bg-soft-warning {
+    background-color: #fff2e0;
+    color: #ea9a1a;
+}
+
+.bg-soft-info {
+    background-color: #e0f7fb;
+    color: #0891b2;
+}
+
+.bg-soft-secondary {
+    background-color: #eef0f2;
+    color: #64748b;
+}
+
+.bg-soft-purple {
+    background-color: #f1e6ff;
+    color: #7c3aed;
+}
+
+// ======================================
+// Legend
+// ======================================
+
+.legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+// ======================================
+// Activity & Announcement
+// ======================================
+
+.announcement-icon,
+.activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: .6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: .95rem;
+}
+
+// ======================================
+// Mini Calendar
+// ======================================
+
+.mini-calendar {
+    width: 200px;
+    text-align: center;
+    font-size: .8rem;
+    border-collapse: separate;
+    border-spacing: 0 .25rem;
+
+    th {
+        color: #9ca3af;
+        font-weight: 500;
+        padding-bottom: .35rem;
+    }
+
+    td {
+        padding: .15rem 0;
+    }
+
+    .today {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #0041a9;
+        color: #fff;
+        font-weight: 600;
+    }
+}
+
+.mini-calendar-table {
+
+    th,
+    td {
+        padding: .25rem .05rem;
+        font-size: .7rem;
+        border: none;
+    }
+
+    thead th {
+        font-weight: 500;
+        font-size: .65rem;
+    }
+}
+
+.today-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: #fff;
+    font-weight: 600;
+    font-size: .68rem;
+}
+
+.agenda-box {
+    max-height: 230px;
+    overflow-y: auto;
+}
+
+// ======================================
+// Donut Chart
+// ======================================
+
+.donut-wrap {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.donut-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.attendance-legend {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    column-gap: 1.75rem;
+    row-gap: .5rem;
+    align-items: center;
+}
+
+.legend-row {
+    display: contents;
 }
