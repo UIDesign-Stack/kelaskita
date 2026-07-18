@@ -49,9 +49,14 @@
                                     @endforelse
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-outline-secondary">Detail</a>
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
-                                    <a href="#" class="btn btn-sm btn-outline-danger">Hapus</a>
+                                    <a href="{{ route('data-master.teachers.show', $teacher) }}" class="btn btn-sm btn-outline-secondary">Detail</a>
+                                    <a href="{{ route('data-master.teachers.edit', $teacher) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <form action="{{ route('data-master.teachers.destroy', $teacher) }}" method="POST" class="d-inline"
+                                        onsubmit="return confirm('Yakin ingin menghapus guru ini? Akun login guru ini juga akan ikut terhapus.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

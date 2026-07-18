@@ -18,6 +18,11 @@ class Teacher extends Model
         return $this->hasMany(SchoolClass::class, 'homeroom_teacher_id');
     }
 
+    public function teachingAssignments()
+    {
+        return $this->hasMany(ClassSubjectTeacher::class);
+    }
+
     public function photoUrl(): string
     {
         $name = $this->user->name ?? 'Guru';

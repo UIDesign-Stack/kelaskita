@@ -25,7 +25,7 @@ Route::prefix('data-master')
     ->middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
         Route::resource('students', StudentController::class)->only(['index', 'create','store']);
-        Route::resource('teachers', TeacherController::class)->only(['index', 'create','store']);
+        Route::resource('teachers', TeacherController::class)->only(['index', 'create','store','show','edit', 'update','destroy']);
     });
 
 require __DIR__.'/auth.php';
