@@ -27,4 +27,9 @@ class SchoolClass extends Model
     {
         return $this->hasMany(Student::class, 'class_id');
     }
+
+    public function teachingAssignments()
+    {
+        return $this->hasMany(ClassSubjectTeacher::class, 'class_id');
+    }
 }

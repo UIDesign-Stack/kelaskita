@@ -43,9 +43,14 @@
                                     <span class="badge text-bg-success text-capitalize">{{ $student->status }}</span>
                                 </td>
                                 <td>
-                                    <a href="#" class="btn btn-sm btn-outline-secondary">Detail</a>
-                                    <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
-                                    <a href="#" class="btn btn-sm btn-outline-danger">Hapus</a>
+                                    <a href="{{ route('data-master.students.show', $student) }}" class="btn btn-sm btn-outline-secondary">Detail</a>
+                                    <a href="{{ route('data-master.students.edit', $student) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                    <form action="{{ route('data-master.students.destroy', $student) }}" method="POST" class="d-inline"
+                                        onsubmit="return confirm('Yakin ingin menghapus data siswa ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

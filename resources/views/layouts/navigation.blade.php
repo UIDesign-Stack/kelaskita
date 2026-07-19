@@ -23,7 +23,7 @@
                 'Data Master' => [
                     'Data Siswa' => route('data-master.students.index'),
                     'Data Guru' => route('data-master.teachers.index'),
-                    'Data Kelas' => '#',
+                    'Data Kelas' => route('data-master.classes.index'),
                     'Mata Pelajaran' => '#',
                     'Tahun Ajaran' => '#',
                 ],
