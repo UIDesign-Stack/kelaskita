@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassController;
@@ -29,6 +30,7 @@ Route::prefix('data-master')
         Route::resource('students', StudentController::class)->only(['index', 'create','store','show', 'edit', 'update', 'destroy']);
         Route::resource('teachers', TeacherController::class)->only(['index', 'create','store','show','edit', 'update','destroy']);
         Route::resource('classes', ClassController::class)->only(['index', 'create','store','show', 'edit', 'update', 'destroy']);
+        Route::resource('subjects', SubjectController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
     });
 
 require __DIR__.'/auth.php';

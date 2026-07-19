@@ -24,7 +24,7 @@
                     'Data Siswa' => route('data-master.students.index'),
                     'Data Guru' => route('data-master.teachers.index'),
                     'Data Kelas' => route('data-master.classes.index'),
-                    'Mata Pelajaran' => '#',
+                    'Mata Pelajaran' => route('data-master.subjects.index'),
                     'Tahun Ajaran' => '#',
                 ],
                 'Akademik' => [
