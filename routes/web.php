@@ -7,6 +7,8 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\GradeController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -33,6 +35,14 @@ Route::prefix('data-master')
         Route::resource('classes', ClassController::class)->only(['index', 'create','store','show', 'edit', 'update', 'destroy']);
         Route::resource('subjects', SubjectController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         Route::resource('school-years', SchoolYearController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-        });
+});
+
+Route::prefix('akademik')
+    ->name('akademik.')
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->group(function () {
+        Route::get('grades', [GradeController::class, 'index'])->name('grades.index');
+});
+ 
 
 require __DIR__.'/auth.php';

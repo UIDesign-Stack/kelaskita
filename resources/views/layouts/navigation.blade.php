@@ -27,8 +27,8 @@
                     'Mata Pelajaran' => route('data-master.subjects.index'),
                     'Tahun Ajaran' => route('data-master.school-years.index'),
                 ],
-                'Akademik' => [
-                    'Rekap Nilai Sekolah' => '#',
+                'Akademik' => [ 
+                    'Rekap Nilai Sekolah' => route('akademik.grades.index'),
                     'Rapor Digital' => '#',
                     'Bank Soal / Materi Ajar' => '#',
                     'RPP & Silabus' => '#',
