@@ -25,7 +25,7 @@
                     'Data Guru' => route('data-master.teachers.index'),
                     'Data Kelas' => route('data-master.classes.index'),
                     'Mata Pelajaran' => route('data-master.subjects.index'),
-                    'Tahun Ajaran' => '#',
+                    'Tahun Ajaran' => route('data-master.school-years.index'),
                 ],
                 'Akademik' => [
                     'Rekap Nilai Sekolah' => '#',
