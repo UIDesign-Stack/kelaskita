@@ -64,7 +64,10 @@ class ClassController extends Controller
             'teachingAssignments.teacher.user',
         ]);
  
-        return view('classes.show', compact('class'));
+        $subjects = \App\Models\Subject::orderBy('name')->get();
+        $teachers = \App\Models\Teacher::with('user')->get();
+ 
+        return view('classes.show', compact('class', 'subjects', 'teachers'));
     }
     public function edit(SchoolClass $class)
     {

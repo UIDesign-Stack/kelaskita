@@ -29,8 +29,8 @@
                 ],
                 'Akademik' => [ 
                     'Rekap Nilai Sekolah' => route('akademik.grades.index'),
-                    'Rapor Digital' => '#',
-                    'Bank Soal / Materi Ajar' => '#',
+                    'Rapor Digital' => route('akademik.report-cards.index'),
+                    'Bank Soal / Materi Ajar' => route('akademik.materials.index'),
                     'RPP & Silabus' => '#',
                 ],
                 'Presensi' => [
@@ -115,8 +115,8 @@
         } elseif (auth()->user()->hasRole('guru')) {
             $menuGroups = [
                 'Akademik' => [
-                    'Input Nilai' => '#',
-                    'Materi Ajar' => '#',
+                    'Input Nilai' => route('guru.grade-input.index'),
+                    'Materi Ajar' => route('guru.materials.index'),
                     'RPP' => '#',
                     'Silabus' => '#',
                     'Jadwal Mengajar' => '#',
