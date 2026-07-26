@@ -15,13 +15,10 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Admin akses semua fitur -> dashboard admin berdiri sendiri, tidak digabung
         if ($user->hasRole('admin')) {
             return $this->adminDashboard();
         }
 
-        // Untuk role lain, gabung $stats dari SEMUA role yang dimiliki user
-        // (penting untuk kasus wali kelas, yang biasanya juga tetap punya role guru)
         $stats = [];
 
         if ($user->hasRole('wali_kelas')) {
