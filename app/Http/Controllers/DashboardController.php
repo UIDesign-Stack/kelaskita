@@ -15,27 +15,32 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // Admin akses semua fitur -> dashboard admin berdiri sendiri, tidak digabung
         if ($user->hasRole('admin')) {
             return $this->adminDashboard();
         }
 
+        // Untuk role lain, gabung $stats dari SEMUA role yang dimiliki user
+        // (penting untuk kasus wali kelas, yang biasanya juga tetap punya role guru)
+        $stats = [];
+
         if ($user->hasRole('wali_kelas')) {
-            return $this->waliKelasDashboard($user);
+            $stats['wali_kelas'] = $this->waliKelasStats($user);
         }
 
         if ($user->hasRole('guru')) {
-            return $this->guruDashboard($user);
+            $stats['guru'] = $this->guruStats($user);
         }
 
         if ($user->hasRole('siswa')) {
-            return $this->siswaDashboard($user);
+            $stats['siswa'] = $this->siswaStats($user);
         }
 
         if ($user->hasRole('orang_tua')) {
-            return $this->orangTuaDashboard($user);
+            $stats['orang_tua'] = $this->orangTuaStats($user);
         }
 
-        return view('dashboard');
+        return view('dashboard', compact('stats'));
     }
 
     private function adminDashboard()
@@ -50,26 +55,24 @@ class DashboardController extends Controller
         return view('dashboard', compact('stats'));
     }
 
-    private function waliKelasDashboard($user)
+    private function waliKelasStats($user): array
     {
         $teacher = $user->teacher;
         $class = $teacher
             ? SchoolClass::where('homeroom_teacher_id', $teacher->id)->first()
             : null;
 
-        $stats = [
+        return [
             'class' => $class,
             'total_students' => $class ? $class->students()->count() : 0,
         ];
-
-        return view('dashboard', compact('stats'));
     }
 
-    private function guruDashboard($user)
+    private function guruStats($user): array
     {
         $teacher = $user->teacher;
 
-        $stats = [
+        return [
             'teacher' => $teacher,
             'total_classes_taught' => $teacher
                 ? DB::table('class_subject_teacher')->where('teacher_id', $teacher->id)->distinct('class_id')->count('class_id')
@@ -78,31 +81,25 @@ class DashboardController extends Controller
                 ? DB::table('class_subject_teacher')->where('teacher_id', $teacher->id)->distinct('subject_id')->count('subject_id')
                 : 0,
         ];
-
-        return view('dashboard', compact('stats'));
     }
 
-    private function siswaDashboard($user)
+    private function siswaStats($user): array
     {
         $student = $user->student;
 
-        $stats = [
+        return [
             'student' => $student,
             'class' => $student?->schoolClass,
         ];
-
-        return view('dashboard', compact('stats'));
     }
 
-    private function orangTuaDashboard($user)
+    private function orangTuaStats($user): array
     {
         $guardian = $user->guardian;
         $children = $guardian ? $guardian->students()->with('schoolClass')->get() : collect();
 
-        $stats = [
+        return [
             'children' => $children,
         ];
-
-        return view('dashboard', compact('stats'));
     }
 }

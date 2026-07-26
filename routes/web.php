@@ -16,6 +16,8 @@ use App\Http\Controllers\ReportCardController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\TeacherDocumentController;
 use App\Http\Controllers\DocumentTypeController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\WalasAttendanceController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -76,7 +78,21 @@ Route::prefix('guru')
         Route::get('documents/create', [TeacherDocumentController::class, 'create'])->name('documents.create');
         Route::post('documents', [TeacherDocumentController::class, 'store'])->name('documents.store');
     });
-
+Route::prefix('presensi')
+    ->name('presensi.')
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->group(function () {
+        Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+});
+Route::prefix('wali-kelas')
+    ->name('wali-kelas.')
+    ->middleware(['auth', 'verified', 'role:wali_kelas'])
+    ->group(function () {
+        Route::get('attendance', [WalasAttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('attendance', [WalasAttendanceController::class, 'store'])->name('attendance.store');
+        Route::get('attendance/recap', [WalasAttendanceController::class, 'recap'])->name('attendance.recap');
+});
+ 
  
 
 require __DIR__.'/auth.php';
