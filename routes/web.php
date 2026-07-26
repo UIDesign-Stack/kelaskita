@@ -20,6 +20,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\WalasAttendanceController;
 use App\Http\Controllers\GuruAttendanceController;
 use App\Http\Controllers\TeacherAttendanceController;
+use App\Http\Controllers\SubstituteTeacherController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -91,6 +92,7 @@ Route::prefix('presensi')
     Route::get('teacher-attendances', [TeacherAttendanceController::class, 'index'])->name('teacher-attendances.index');
     Route::get('teacher-attendances/create', [TeacherAttendanceController::class, 'create'])->name('teacher-attendances.create');
     Route::post('teacher-attendances', [TeacherAttendanceController::class, 'store'])->name('teacher-attendances.store');
+    Route::resource('substitute-teachers', SubstituteTeacherController::class)->only(['index', 'create', 'store', 'destroy']);
 });
 Route::prefix('wali-kelas')
     ->name('wali-kelas.')

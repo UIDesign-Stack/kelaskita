@@ -34,7 +34,7 @@
             'Presensi' => [
                 'Presensi Siswa' => route('presensi.attendances.index'),
                 'Absensi Guru' => route('presensi.teacher-attendances.index'),
-                'Log Guru Pengganti' => '#',
+                'Log Guru Pengganti' => route('presensi.substitute-teachers.index'),
             ],
             'Ujian & Evaluasi' => [
                 'Bank Soal Ujian' => '#',
