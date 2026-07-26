@@ -21,6 +21,8 @@ use App\Http\Controllers\WalasAttendanceController;
 use App\Http\Controllers\GuruAttendanceController;
 use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\SubstituteTeacherController;
+use App\Http\Controllers\ExamController;
+use App\Http\Controllers\ExamQuestionController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -83,6 +85,10 @@ Route::prefix('guru')
         Route::get('attendance', [GuruAttendanceController::class, 'index'])->name('attendance.index');
         Route::get('attendance/{assignment}', [GuruAttendanceController::class, 'create'])->name('attendance.create');
         Route::post('attendance/{assignment}', [GuruAttendanceController::class, 'store'])->name('attendance.store');
+        Route::resource('exams', ExamController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+        Route::get('exams/{exam}/questions/create', [ExamQuestionController::class, 'create'])->name('exams.questions.create');
+        Route::post('exams/{exam}/questions', [ExamQuestionController::class, 'store'])->name('exams.questions.store');
+        Route::delete('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'destroy'])->name('exams.questions.destroy');
     });
 Route::prefix('presensi')
     ->name('presensi.')

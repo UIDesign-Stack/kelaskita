@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('school_year_id')->constrained('school_years')->cascadeOnDelete();
-            $table->string('name'); // contoh: 7A
-            $table->string('grade_level'); // contoh: 7, 8, 9
+            $table->string('name');
+            $table->string('grade_level');
             $table->foreignId('homeroom_teacher_id')->nullable()
                 ->constrained('teachers')->nullOnDelete();
             $table->timestamps();

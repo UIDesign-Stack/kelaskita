@@ -119,7 +119,7 @@
                 'Jadwal Mengajar' => '#',
             ],
             'Ujian & Evaluasi' => [
-                'Buat Soal Ujian' => '#',
+                'Buat Soal Ujian' => route('guru.exams.index'),
                 'CBT / Kuis' => '#',
                 'Analisis Butir Soal' => '#',
             ],

@@ -8,7 +8,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Pakai raw statement supaya tidak butuh package doctrine/dbal
         DB::statement('ALTER TABLE teachers CHANGE nip nuptk VARCHAR(50) NULL');
     }
 

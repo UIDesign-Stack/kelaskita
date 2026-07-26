@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('school_years', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // contoh: 2025/2026
+            $table->string('name');
             $table->enum('semester', ['ganjil', 'genap']);
             $table->boolean('is_active')->default(false);
             $table->timestamps();
