@@ -26,12 +26,13 @@
                     'Data Kelas' => route('data-master.classes.index'),
                     'Mata Pelajaran' => route('data-master.subjects.index'),
                     'Tahun Ajaran' => route('data-master.school-years.index'),
+                    'Jenis Dokumen' => route('data-master.document-types.index')
                 ],
                 'Akademik' => [ 
                     'Rekap Nilai Sekolah' => route('akademik.grades.index'),
                     'Rapor Digital' => route('akademik.report-cards.index'),
                     'Bank Soal / Materi Ajar' => route('akademik.materials.index'),
-                    'RPP & Silabus' => '#',
+                    'Dokumen Mengajar (CP/ATP/Modul Ajar)' => route('akademik.documents.index'),
                 ],
                 'Presensi' => [
                     'Presensi Siswa' => '#',
@@ -117,8 +118,7 @@
                 'Akademik' => [
                     'Input Nilai' => route('guru.grade-input.index'),
                     'Materi Ajar' => route('guru.materials.index'),
-                    'RPP' => '#',
-                    'Silabus' => '#',
+                    'Dokumen Mengajar' => route('guru.documents.index'),
                     'Jadwal Mengajar' => '#',
                 ],
                 'Ujian & Evaluasi' => [

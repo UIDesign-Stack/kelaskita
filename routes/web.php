@@ -13,7 +13,9 @@ use App\Http\Controllers\GradeController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\TeacherMaterialController;
 use App\Http\Controllers\ReportCardController;
-
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\TeacherDocumentController;
+use App\Http\Controllers\DocumentTypeController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -26,7 +28,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'edit'])
+    ->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     
@@ -43,17 +46,20 @@ Route::prefix('data-master')
         Route::resource('school-years', SchoolYearController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         Route::post('classes/{class}/teaching-assignments', [TeachingAssignmentController::class, 'store'])->name('classes.teaching-assignments.store');
         Route::delete('teaching-assignments/{assignment}', [TeachingAssignmentController::class, 'destroy'])->name('teaching-assignments.destroy');        
+        Route::resource('document-types', DocumentTypeController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 Route::prefix('akademik')
     ->name('akademik.')
     ->middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
-        Route::get('grades', [GradeController::class, 'index'])->name('grades.index');
+        Route::get('grades', [GradeController::class, 'index'])
+        ->name('grades.index');
         Route::get('report-cards', [ReportCardController::class, 'index'])->name('report-cards.index');
         Route::get('report-cards/{student}', [ReportCardController::class, 'show'])->name('report-cards.show');
         Route::post('report-cards/{reportCard}/finalize', [ReportCardController::class, 'finalize'])->name('report-cards.finalize');
         Route::get('materials', [MaterialController::class, 'index'])->name('materials.index');
+        Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
     });
 
 Route::prefix('guru')
@@ -66,6 +72,9 @@ Route::prefix('guru')
         Route::get('materials', [TeacherMaterialController::class, 'index'])->name('materials.index');
         Route::get('materials/create', [TeacherMaterialController::class, 'create'])->name('materials.create');
         Route::post('materials', [TeacherMaterialController::class, 'store'])->name('materials.store');
+        Route::get('documents', [TeacherDocumentController::class, 'index'])->name('documents.index');
+        Route::get('documents/create', [TeacherDocumentController::class, 'create'])->name('documents.create');
+        Route::post('documents', [TeacherDocumentController::class, 'store'])->name('documents.store');
     });
 
  

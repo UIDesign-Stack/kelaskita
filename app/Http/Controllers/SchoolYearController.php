@@ -80,7 +80,11 @@ class SchoolYearController extends Controller
     {
         if ($schoolYear->classes()->exists()) {
             return back()->withErrors([
-                'delete' => 'Tahun ajaran "' . $schoolYear->name . '" masih memiliki data kelas. Hapus atau pindahkan kelas-kelas tersebut terlebih dahulu (menghapus tahun ajaran akan ikut menghapus semua kelas di dalamnya).',
+                'delete' => 'Tahun ajaran "' . $schoolYear->name . 
+                '" masih memiliki data kelas. Hapus atau pindahkan 
+                kelas-kelas tersebut terlebih dahulu 
+                (menghapus tahun ajaran akan ikut menghapus semua 
+                kelas di dalamnya).',
             ]);
         }
 
