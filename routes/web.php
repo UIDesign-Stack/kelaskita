@@ -18,6 +18,8 @@ use App\Http\Controllers\TeacherDocumentController;
 use App\Http\Controllers\DocumentTypeController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\WalasAttendanceController;
+use App\Http\Controllers\GuruAttendanceController;
+use App\Http\Controllers\TeacherAttendanceController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -77,12 +79,18 @@ Route::prefix('guru')
         Route::get('documents', [TeacherDocumentController::class, 'index'])->name('documents.index');
         Route::get('documents/create', [TeacherDocumentController::class, 'create'])->name('documents.create');
         Route::post('documents', [TeacherDocumentController::class, 'store'])->name('documents.store');
+        Route::get('attendance', [GuruAttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('attendance/{assignment}', [GuruAttendanceController::class, 'create'])->name('attendance.create');
+        Route::post('attendance/{assignment}', [GuruAttendanceController::class, 'store'])->name('attendance.store');
     });
 Route::prefix('presensi')
     ->name('presensi.')
     ->middleware(['auth', 'verified', 'role:admin'])
     ->group(function () {
-        Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('teacher-attendances', [TeacherAttendanceController::class, 'index'])->name('teacher-attendances.index');
+    Route::get('teacher-attendances/create', [TeacherAttendanceController::class, 'create'])->name('teacher-attendances.create');
+    Route::post('teacher-attendances', [TeacherAttendanceController::class, 'store'])->name('teacher-attendances.store');
 });
 Route::prefix('wali-kelas')
     ->name('wali-kelas.')

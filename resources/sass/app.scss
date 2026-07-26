@@ -1,9 +1,25 @@
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+$brand-blue: #0041a9;
+$brand-blue-deep: #002d73;
+$brand-cyan: #027ca0;
+$brand-cyan-light: #5cc2e0;
+
+$chalk-white: #F5F1E8;
+$chalk-yellow: #F2C14E;
+$coral: #E8623D;
+$ink: #1E2530;
+$paper-muted: #EFEAD9;
+$text-muted: #5b6459;
+
 body {
     min-height: 100vh;
 }
+
+// =========================================================
+// Sidebar
+// =========================================================
 
 .sidebar {
     width: 250px;
@@ -11,7 +27,7 @@ body {
     position: sticky;
     top: 0;
     overflow-y: auto;
-    background: linear-gradient(180deg, #0041a9 0%, #027ca0 100%);
+    background: linear-gradient(180deg, $brand-blue 0%, $brand-cyan 100%);
 
     .sidebar-logo {
         width: 32px;
@@ -165,7 +181,7 @@ body {
 
 .bg-soft-primary {
     background-color: #e0edff;
-    color: #0041a9;
+    color: $brand-blue;
 }
 
 .bg-soft-success {
@@ -249,7 +265,7 @@ body {
         width: 26px;
         height: 26px;
         border-radius: 50%;
-        background: #0041a9;
+        background: $brand-blue;
         color: #fff;
         font-weight: 600;
     }
@@ -317,4 +333,403 @@ body {
 
 .legend-row {
     display: contents;
+}
+
+.font-chalk {
+    font-family: 'Caveat', cursive;
+}
+
+// ===== Navbar =====
+
+.navbar-kk {
+    background: $brand-blue;
+    padding: .9rem 0;
+
+    .navbar-brand {
+        font-family: 'Caveat', cursive;
+        font-size: 2rem;
+        font-weight: 700;
+        color: $chalk-yellow !important;
+        letter-spacing: .5px;
+    }
+
+    .nav-link {
+        color: $chalk-white !important;
+        font-weight: 500;
+        font-size: .95rem;
+        margin: 0 .6rem;
+        opacity: .85;
+
+        &:hover {
+            opacity: 1;
+            color: $chalk-yellow !important;
+        }
+    }
+}
+
+.btn-chalk-outline {
+    border: 1.5px solid $chalk-white;
+    color: $chalk-white;
+    border-radius: 999px;
+    padding: .45rem 1.3rem;
+    font-weight: 600;
+    font-size: .9rem;
+
+    &:hover {
+        background: $chalk-white;
+        color: $brand-blue;
+    }
+}
+
+.btn-coral {
+    background: $coral;
+    color: $chalk-white;
+    border-radius: 999px;
+    padding: .45rem 1.4rem;
+    font-weight: 700;
+    font-size: .9rem;
+    border: none;
+
+    &:hover {
+        background: darken($coral, 8%);
+        color: #fff;
+    }
+}
+
+// ===== Hero (papan tulis) =====
+
+.hero-board {
+    background: radial-gradient(ellipse at top left, rgba(255, 255, 255, .05), transparent 55%), $brand-blue;
+    position: relative;
+    overflow: hidden;
+    padding: 6rem 0 7rem;
+    border-bottom: 10px solid $brand-blue-deep;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, .02) 0px, rgba(255, 255, 255, .02) 1px, transparent 1px, transparent 42px);
+        pointer-events: none;
+    }
+}
+
+.chalk-eyebrow {
+    display: inline-block;
+    color: $brand-cyan-light;
+    font-weight: 600;
+    font-size: .85rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    border-bottom: 2px dotted rgba(92, 194, 224, .5);
+    padding-bottom: 4px;
+    margin-bottom: 1.4rem;
+}
+
+.hero-title {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    color: $chalk-white;
+    line-height: 1.05;
+    margin-bottom: 1.2rem;
+
+    .underline-word {
+        position: relative;
+        color: $chalk-yellow;
+
+        svg {
+            position: absolute;
+            left: 0;
+            bottom: -14px;
+            width: 100%;
+            height: 18px;
+        }
+    }
+}
+
+.hero-sub {
+    color: rgba(245, 241, 232, .8);
+    font-size: 1.1rem;
+    max-width: 480px;
+    margin-bottom: 2.2rem;
+}
+
+.hero-doodle {
+    position: absolute;
+    opacity: .55;
+}
+
+.stat-strip {
+    background: $brand-blue-deep;
+}
+
+.stat-item {
+    padding: 1.6rem 1rem;
+    text-align: center;
+    border-right: 1px dashed rgba(245, 241, 232, .15);
+
+    &:last-child {
+        border-right: none;
+    }
+}
+
+.stat-num {
+    font-family: 'Caveat', cursive;
+    font-size: 2.4rem;
+    color: $chalk-yellow;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    color: rgba(245, 241, 232, .75);
+    font-size: .82rem;
+    font-weight: 500;
+    margin-top: .2rem;
+}
+
+// ===== Section headings =====
+
+.section-eyebrow {
+    font-family: 'Caveat', cursive;
+    font-size: 1.4rem;
+    color: $coral;
+    font-weight: 700;
+    margin-bottom: -.3rem;
+    display: block;
+}
+
+.section-title {
+    font-weight: 800;
+    font-size: 2rem;
+    color: $ink;
+}
+
+.section-desc {
+    color: $text-muted;
+    max-width: 560px;
+}
+
+// ===== Notebook section =====
+
+.notebook-section {
+    position: relative;
+    padding: 5rem 0;
+    background: $chalk-white;
+}
+
+.notebook-spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 34px;
+    background: repeating-linear-gradient(180deg, transparent 0 26px, rgba(0, 65, 169, .15) 26px 28px);
+
+    @media (max-width: 767.98px) {
+        display: none;
+    }
+}
+
+// ===== Sticky note cards =====
+
+.sticky-note {
+    background: #fff;
+    border: 1px solid rgba(0, 65, 169, .08);
+    border-radius: 10px;
+    padding: 1.6rem;
+    height: 100%;
+    box-shadow: 0 10px 24px rgba(0, 65, 169, .07);
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+        transform: translateY(-4px) rotate(0deg) !important;
+        box-shadow: 0 16px 32px rgba(0, 65, 169, .13);
+    }
+}
+
+.rot-1 { transform: rotate(-1.4deg); }
+.rot-2 { transform: rotate(1.1deg); }
+.rot-3 { transform: rotate(-.6deg); }
+.rot-4 { transform: rotate(1.6deg); }
+.rot-5 { transform: rotate(-1deg); }
+.rot-6 { transform: rotate(.8deg); }
+
+.cat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: $brand-blue;
+    background: $chalk-yellow;
+    margin-bottom: 1rem;
+}
+
+.cat-count {
+    font-size: .8rem;
+    color: $coral;
+    font-weight: 700;
+}
+
+// ===== Feature rows =====
+
+.feature-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: $brand-blue;
+    color: $chalk-yellow;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+// ===== Testimonials =====
+
+.testi-section {
+    background: $paper-muted;
+    padding: 5rem 0;
+}
+
+.testi-card {
+    background: $chalk-white;
+    border-radius: 4px;
+    padding: 1.8rem;
+    position: relative;
+    box-shadow: 0 8px 18px rgba(0, 65, 169, .08);
+    height: 100%;
+
+    &::before {
+        content: "\201C";
+        font-family: Georgia, serif;
+        font-size: 3.2rem;
+        color: $coral;
+        opacity: .25;
+        position: absolute;
+        top: 6px;
+        left: 14px;
+        line-height: 1;
+    }
+}
+
+.testi-text {
+    font-size: .96rem;
+    color: #4a5248;
+    position: relative;
+    z-index: 1;
+    margin-top: 1.4rem;
+}
+
+.testi-name {
+    font-weight: 700;
+    font-size: .92rem;
+    margin-bottom: 0;
+}
+
+.testi-role {
+    font-size: .78rem;
+    color: #8a9184;
+}
+
+.testi-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: $brand-cyan;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-family: 'Caveat', cursive;
+    font-size: 1.3rem;
+}
+
+// ===== CTA banner =====
+
+.cta-board {
+    background: $brand-blue;
+    border-radius: 18px;
+    padding: 3.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+
+    h2 {
+        font-family: 'Caveat', cursive;
+        font-size: clamp(2rem, 4vw, 3rem);
+        color: $chalk-white;
+        font-weight: 700;
+    }
+}
+
+// ===== Footer =====
+
+.footer-kk {
+    background: $brand-blue-deep;
+    color: rgba(245, 241, 232, .7);
+    padding: 3.5rem 0 1.5rem;
+    font-size: .9rem;
+
+    .footer-brand {
+        font-family: 'Caveat', cursive;
+        font-size: 1.8rem;
+        color: $chalk-yellow;
+        font-weight: 700;
+    }
+
+    h6 {
+        color: $chalk-white;
+        font-weight: 700;
+        font-size: .82rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin-bottom: 1rem;
+    }
+
+    a {
+        color: rgba(245, 241, 232, .7);
+
+        &:hover {
+            color: $chalk-yellow;
+        }
+    }
+
+    .social-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(245, 241, 232, .25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            border-color: $chalk-yellow;
+        }
+    }
+
+    hr.footer-rule {
+        border-color: rgba(245, 241, 232, .12);
+    }
+}
+
+// ===== Accessibility =====
+
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid $chalk-yellow;
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sticky-note {
+        transition: none;
+    }
 }

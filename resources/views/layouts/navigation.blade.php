@@ -33,7 +33,7 @@
             ],
             'Presensi' => [
                 'Presensi Siswa' => route('presensi.attendances.index'),
-                'Absensi Guru' => '#',
+                'Absensi Guru' => route('presensi.teacher-attendances.index'),
                 'Log Guru Pengganti' => '#',
             ],
             'Ujian & Evaluasi' => [
@@ -124,7 +124,7 @@
                 'Analisis Butir Soal' => '#',
             ],
             'Presensi' => [
-                'Presensi per Mapel' => '#',
+                'Presensi per Mapel' => route('guru.attendance.index'),
             ],
             'Administrasi' => [
                 'Jurnal Mengajar' => '#',
