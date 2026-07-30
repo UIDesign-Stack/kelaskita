@@ -57,11 +57,12 @@ class ExamController extends Controller
             'type' => $validated['type'],
             'is_cbt' => $request->boolean('is_cbt', true),
             'duration_minutes' => $validated['duration_minutes'],
+            'status' => 'pending',
         ]);
 
         return redirect()
             ->route('guru.exams.show', $exam)
-            ->with('status', 'Paket ujian berhasil dibuat. Sekarang tambahkan soal-soalnya.');
+            ->with('status', 'Paket ujian berhasil dibuat. Sekarang tambahkan soal-soalnya, lalu tunggu persetujuan admin.');
     }
 
     public function show(Exam $exam)
@@ -82,6 +83,22 @@ class ExamController extends Controller
         return redirect()
             ->route('guru.exams.index')
             ->with('status', 'Paket ujian berhasil dihapus.');
+    }
+
+    public function resubmit(Exam $exam)
+    {
+        $this->authorizeExam($exam);
+
+        $exam->update([
+            'status' => 'pending',
+            'rejection_reason' => null,
+            'reviewed_by' => null,
+            'reviewed_at' => null,
+        ]);
+
+        return redirect()
+            ->route('guru.exams.show', $exam)
+            ->with('status', 'Paket ujian berhasil diajukan ulang untuk direview admin.');
     }
 
     private function authorizeExam(Exam $exam): void

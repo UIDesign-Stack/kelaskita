@@ -22,7 +22,35 @@
         </div>
     @endif
 
-    <div class="d-flex justify-content-end mb-3">
+    @php
+        $statusColor = match($exam->status) {
+            'approved' => 'success', 'rejected' => 'danger', default => 'warning',
+        };
+        $statusLabel = match($exam->status) {
+            'approved' => 'Disetujui Admin', 'rejected' => 'Ditolak Admin', default => 'Menunggu Persetujuan Admin',
+        };
+    @endphp
+
+    <div class="alert alert-{{ $statusColor }} alert-dismissible fade show" role="alert">
+        Status: <strong>{{ $statusLabel }}</strong>
+        @if ($exam->status === 'rejected' && $exam->rejection_reason)
+            <div class="mt-1">
+                <strong>Alasan ditolak:</strong> {{ $exam->rejection_reason }}
+                <div class="small mt-1">Perbaiki soal sesuai catatan admin, lalu klik "Ajukan Ulang" di bawah.</div>
+            </div>
+        @endif
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        @if ($exam->status === 'rejected')
+            <form action="{{ route('guru.exams.resubmit', $exam) }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-warning btn-sm">↻ Ajukan Ulang untuk Direview</button>
+            </form>
+        @else
+            <span></span>
+        @endif
         <a href="{{ route('guru.exams.questions.create', $exam) }}" class="btn btn-primary btn-sm">+ Tambah Soal</a>
     </div>
 
@@ -49,9 +77,7 @@
                                         @if ($question->$field)
                                             <li class="{{ $question->correct_answer === $label ? 'text-success fw-semibold' : '' }}">
                                                 {{ $label }}. {{ $question->$field }}
-                                                @if ($question->correct_answer === $label)
-                                                    <i class="bi bi-check-circle-fill"></i>
-                                                @endif
+                                                @if ($question->correct_answer === $label) ✓ @endif
                                             </li>
                                         @endif
                                     @endforeach

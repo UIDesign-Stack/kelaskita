@@ -37,7 +37,7 @@
                 'Log Guru Pengganti' => route('presensi.substitute-teachers.index'),
             ],
             'Ujian & Evaluasi' => [
-                'Bank Soal Ujian' => '#',
+                'Bank Soal Ujian' => route('ujian.exam-review.index'),
                 'CBT / Kuis Online' => '#',
                 'Analisis Butir Soal' => '#',
             ],

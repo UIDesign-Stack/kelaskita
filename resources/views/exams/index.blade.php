@@ -30,7 +30,7 @@
                                 <th>Kelas</th>
                                 <th>Jenis</th>
                                 <th>Jumlah Soal</th>
-                                <th>Durasi</th>
+                                <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -42,7 +42,20 @@
                                     <td>{{ $exam->schoolClass->name ?? '-' }}</td>
                                     <td class="text-uppercase">{{ $exam->type }}</td>
                                     <td>{{ $exam->questions_count }} soal</td>
-                                    <td>{{ $exam->duration_minutes }} menit</td>
+                                    <td>
+                                        @php
+                                            $statusColor = match($exam->status) {
+                                                'approved' => 'success', 'rejected' => 'danger', default => 'warning',
+                                            };
+                                            $statusLabel = match($exam->status) {
+                                                'approved' => 'Disetujui', 'rejected' => 'Ditolak', default => 'Menunggu',
+                                            };
+                                        @endphp
+                                        <span class="badge text-bg-{{ $statusColor }}">{{ $statusLabel }}</span>
+                                        @if ($exam->status === 'rejected' && $exam->rejection_reason)
+                                            <div class="text-danger small mt-1">{{ Str::limit($exam->rejection_reason, 60) }}</div>
+                                        @endif
+                                    </td>
                                     <td>
                                         <a href="{{ route('guru.exams.show', $exam) }}" class="btn btn-sm btn-outline-primary">Kelola Soal</a>
                                         <form action="{{ route('guru.exams.destroy', $exam) }}" method="POST" class="d-inline"

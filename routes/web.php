@@ -23,6 +23,7 @@ use App\Http\Controllers\TeacherAttendanceController;
 use App\Http\Controllers\SubstituteTeacherController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExamQuestionController;
+use App\Http\Controllers\ExamReviewController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -89,6 +90,7 @@ Route::prefix('guru')
         Route::get('exams/{exam}/questions/create', [ExamQuestionController::class, 'create'])->name('exams.questions.create');
         Route::post('exams/{exam}/questions', [ExamQuestionController::class, 'store'])->name('exams.questions.store');
         Route::delete('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'destroy'])->name('exams.questions.destroy');
+        Route::post('exams/{exam}/resubmit', [ExamController::class, 'resubmit'])->name('exams.resubmit');
     });
 Route::prefix('presensi')
     ->name('presensi.')
@@ -109,6 +111,14 @@ Route::prefix('wali-kelas')
         Route::get('attendance/recap', [WalasAttendanceController::class, 'recap'])->name('attendance.recap');
 });
  
- 
+ Route::prefix('ujian')
+    ->name('ujian.')
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->group(function () {
+        Route::get('exam-review', [ExamReviewController::class, 'index'])->name('exam-review.index');
+        Route::get('exam-review/{exam}', [ExamReviewController::class, 'show'])->name('exam-review.show');
+        Route::post('exam-review/{exam}/approve', [ExamReviewController::class, 'approve'])->name('exam-review.approve');
+        Route::post('exam-review/{exam}/reject', [ExamReviewController::class, 'reject'])->name('exam-review.reject');
+    });
 
 require __DIR__.'/auth.php';
