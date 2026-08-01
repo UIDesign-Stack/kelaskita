@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTeacherDocumentRequest;
 use App\Models\DocumentType;
 use App\Models\TeachingDocument;
 use Illuminate\Http\Request;
@@ -13,15 +14,17 @@ class TeacherDocumentController extends Controller
     {
         $teacher = Auth::user()->teacher;
 
-        $query = $teacher
-            ? TeachingDocument::with(['subject', 'documentType'])->where('teacher_id', $teacher->id)
-            : TeachingDocument::whereRaw('1 = 0');
+        $documents = $teacher
+            ? TeachingDocument::with(['subject', 'documentType'])
+                ->where('teacher_id', $teacher->id)
+                ->when($request->filled('type'), function ($q) use ($request) {
+                    $q->whereHas('documentType', fn ($sq) => $sq->where('code', $request->type));
+                })
+                ->latest()
+                ->paginate(15)
+                ->withQueryString()
+            : TeachingDocument::whereRaw('1 = 0')->paginate(15);
 
-        if ($request->filled('type')) {
-            $query->whereHas('documentType', fn ($q) => $q->where('code', $request->type));
-        }
-
-        $documents = $query->latest()->get();
         $documentTypes = DocumentType::where('is_active', true)->orderBy('name')->get();
 
         return view('documents-input.index', compact('documents', 'documentTypes'));
@@ -44,25 +47,11 @@ class TeacherDocumentController extends Controller
         return view('documents-input.create', compact('subjects', 'documentTypes', 'selectedType'));
     }
 
-    public function store(Request $request)
+    public function store(StoreTeacherDocumentRequest $request)
     {
         $teacher = Auth::user()->teacher;
-
-        abort_if(!$teacher, 403, 'Akun Anda tidak terhubung ke data guru.');
-
-        $validated = $request->validate([
-            'subject_id' => ['required', 'exists:subjects,id'],
-            'document_type_id' => ['required', 'exists:document_types,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'semester' => ['nullable', 'in:ganjil,genap'],
-            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
-        ]);
-
+        $validated = $request->validated();
         $documentType = DocumentType::findOrFail($validated['document_type_id']);
-
-        if ($documentType->requires_semester && empty($validated['semester'])) {
-            return back()->withInput()->withErrors(['semester' => 'Jenis dokumen ini wajib memilih semester.']);
-        }
 
         $filePath = null;
         if ($request->hasFile('file')) {

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreWalasAttendanceRequest;
 use App\Models\Attendance;
+use App\Models\SchoolClass;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -30,17 +32,10 @@ class WalasAttendanceController extends Controller
         return view('walas-attendance.index', compact('class', 'students', 'existing', 'date'));
     }
 
-    public function store(Request $request)
+    public function store(StoreWalasAttendanceRequest $request)
     {
-        $class = $this->homeroomClass();
-
-        abort_if(!$class, 403, 'Anda bukan wali kelas manapun.');
-
-        $validated = $request->validate([
-            'date' => ['required', 'date'],
-            'status' => ['required', 'array'],
-            'status.*' => ['required', 'in:hadir,izin,sakit,alpa'],
-        ]);
+        $class = $request->resolveHomeroomClass();
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $class) {
             foreach ($validated['status'] as $studentId => $status) {
@@ -76,21 +71,26 @@ class WalasAttendanceController extends Controller
         if ($class) {
             $students = $class->students()->orderBy('name')->get();
 
-            $recap = $students->map(function ($student) use ($dateFrom, $dateTo) {
-                $counts = Attendance::where('student_id', $student->id)
-                    ->whereNull('subject_id')
-                    ->whereDate('date', '>=', $dateFrom)
-                    ->whereDate('date', '<=', $dateTo)
-                    ->selectRaw('status, count(*) as total')
-                    ->groupBy('status')
-                    ->pluck('total', 'status');
+            // 1 query untuk semua siswa sekaligus (student_id + status),
+            // dibanding query terpisah per siswa di dalam map().
+            $counts = Attendance::whereIn('student_id', $students->pluck('id'))
+                ->whereNull('subject_id')
+                ->whereDate('date', '>=', $dateFrom)
+                ->whereDate('date', '<=', $dateTo)
+                ->selectRaw('student_id, status, count(*) as total')
+                ->groupBy('student_id', 'status')
+                ->get()
+                ->groupBy('student_id');
+
+            $recap = $students->map(function ($student) use ($counts) {
+                $studentCounts = $counts->get($student->id, collect())->pluck('total', 'status');
 
                 return [
                     'student' => $student,
-                    'hadir' => $counts['hadir'] ?? 0,
-                    'izin' => $counts['izin'] ?? 0,
-                    'sakit' => $counts['sakit'] ?? 0,
-                    'alpa' => $counts['alpa'] ?? 0,
+                    'hadir' => $studentCounts['hadir'] ?? 0,
+                    'izin' => $studentCounts['izin'] ?? 0,
+                    'sakit' => $studentCounts['sakit'] ?? 0,
+                    'alpa' => $studentCounts['alpa'] ?? 0,
                 ];
             });
         }
@@ -98,10 +98,17 @@ class WalasAttendanceController extends Controller
         return view('walas-attendance.recap', compact('class', 'recap', 'dateFrom', 'dateTo'));
     }
 
-    private function homeroomClass()
+    private function homeroomClass(): ?SchoolClass
     {
         $teacher = Auth::user()->teacher;
 
-        return $teacher ? $teacher->homeroomClasses()->with('students')->first() : null;
+        if (! $teacher) {
+            return null;
+        }
+
+        return $teacher->homeroomClasses()
+            ->whereHas('schoolYear', fn ($q) => $q->where('is_active', true))
+            ->with('students')
+            ->first();
     }
 }

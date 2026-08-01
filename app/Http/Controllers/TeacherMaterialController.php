@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreMaterialRequest;
 use App\Models\Material;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TeacherMaterialController extends Controller
@@ -13,8 +13,8 @@ class TeacherMaterialController extends Controller
         $teacher = Auth::user()->teacher;
 
         $materials = $teacher
-            ? Material::with('subject')->where('teacher_id', $teacher->id)->latest()->get()
-            : collect();
+            ? Material::with('subject')->where('teacher_id', $teacher->id)->latest()->paginate(15)->withQueryString()
+            : Material::whereRaw('1 = 0')->paginate(15);
 
         return view('materials-input.index', compact('materials', 'teacher'));
     }
@@ -30,18 +30,10 @@ class TeacherMaterialController extends Controller
         return view('materials-input.create', compact('subjects'));
     }
 
-    public function store(Request $request)
+    public function store(StoreMaterialRequest $request)
     {
         $teacher = Auth::user()->teacher;
-
-        abort_if(!$teacher, 403, 'Akun Anda tidak terhubung ke data guru.');
-
-        $validated = $request->validate([
-            'subject_id' => ['required', 'exists:subjects,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,jpg,png', 'max:10240'],
-        ]);
+        $validated = $request->validated();
 
         $filePath = null;
         if ($request->hasFile('file')) {

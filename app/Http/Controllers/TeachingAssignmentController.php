@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ClassSubjectTeacher;
 use App\Models\SchoolClass;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
 
 class TeachingAssignmentController extends Controller
 {
@@ -27,12 +27,23 @@ class TeachingAssignmentController extends Controller
             ]);
         }
 
-        ClassSubjectTeacher::create([
-            'class_id' => $class->id,
-            'subject_id' => $validated['subject_id'],
-            'teacher_id' => $validated['teacher_id'],
-            'school_year_id' => $class->school_year_id,
-        ]);
+        try {
+            ClassSubjectTeacher::create([
+                'class_id' => $class->id,
+                'subject_id' => $validated['subject_id'],
+                'teacher_id' => $validated['teacher_id'],
+                'school_year_id' => $class->school_year_id,
+            ]);
+        } catch (QueryException $e) {
+
+            if ($e->getCode() === '23000') {
+                return back()->withErrors([
+                    'subject_id' => 'Mata pelajaran ini sudah punya guru pengampu di kelas ini untuk tahun ajaran yang sama.',
+                ]);
+            }
+
+            throw $e;
+        }
 
         return redirect()
             ->route('data-master.classes.show', $class)
