@@ -1,4 +1,7 @@
-import './bootstrap';
+import $ from 'jquery';
+
+window.$ = window.jQuery = $;
+import 'datatables.net-bs5';
 
 import Alpine from 'alpinejs';
 import * as bootstrap from 'bootstrap';
