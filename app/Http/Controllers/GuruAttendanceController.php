@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreAttendanceRequest;
 use App\Models\Attendance;
 use App\Models\ClassSubjectTeacher;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class GuruAttendanceController extends Controller
 
     public function create(ClassSubjectTeacher $assignment, Request $request)
     {
-        $this->authorizeAssignment($assignment);
+        $this->authorize('manage', $assignment);
 
         $assignment->load(['schoolClass.students' => fn ($q) => $q->orderBy('name'), 'subject']);
 
@@ -37,15 +38,9 @@ class GuruAttendanceController extends Controller
         return view('guru-attendance.create', compact('assignment', 'date', 'existing'));
     }
 
-    public function store(ClassSubjectTeacher $assignment, Request $request)
+    public function store(ClassSubjectTeacher $assignment, StoreAttendanceRequest $request)
     {
-        $this->authorizeAssignment($assignment);
-
-        $validated = $request->validate([
-            'date' => ['required', 'date'],
-            'status' => ['required', 'array'],
-            'status.*' => ['required', 'in:hadir,izin,sakit,alpa'],
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $assignment) {
             foreach ($validated['status'] as $studentId => $status) {
@@ -67,12 +62,5 @@ class GuruAttendanceController extends Controller
         return redirect()
             ->route('guru.attendance.create', ['assignment' => $assignment->id, 'date' => $validated['date']])
             ->with('status', 'Presensi berhasil disimpan.');
-    }
-
-    private function authorizeAssignment(ClassSubjectTeacher $assignment): void
-    {
-        $teacher = Auth::user()->teacher;
-
-        abort_if(!$teacher || $assignment->teacher_id !== $teacher->id, 403, 'Anda tidak memiliki akses ke kelas/mapel ini.');
     }
 }

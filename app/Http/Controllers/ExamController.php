@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClassSubjectTeacher;
+use App\Http\Requests\StoreExamRequest;
 use App\Models\Exam;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ExamController extends Controller
 {
     public function index()
     {
-        $teacher = Auth::user()->teacher;
+        $teacher = $this->currentTeacher();
 
         $exams = $teacher
-            ? Exam::with(['subject', 'schoolClass'])->where('teacher_id', $teacher->id)->withCount('questions')->latest()->get()
+            ? Exam::with(['subject', 'schoolClass'])
+                ->where('teacher_id', $teacher->id)
+                ->withCount('questions')
+                ->latest()
+                ->get()
             : collect();
 
         return view('exams.index', compact('exams'));
@@ -22,7 +25,7 @@ class ExamController extends Controller
 
     public function create()
     {
-        $teacher = Auth::user()->teacher;
+        $teacher = $this->currentTeacher();
 
         $assignments = $teacher
             ? $teacher->teachingAssignments()->with(['schoolClass', 'subject'])->get()
@@ -31,34 +34,9 @@ class ExamController extends Controller
         return view('exams.create', compact('assignments'));
     }
 
-    public function store(Request $request)
+    public function store(StoreExamRequest $request)
     {
-        $teacher = Auth::user()->teacher;
-
-        abort_if(!$teacher, 403);
-
-        $validated = $request->validate([
-            'assignment_id' => ['required', 'exists:class_subject_teacher,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'type' => ['required', 'in:kuis,tryout,uts,uas'],
-            'is_cbt' => ['nullable', 'boolean'],
-            'duration_minutes' => ['required', 'integer', 'min:1', 'max:300'],
-        ]);
-
-        $assignment = ClassSubjectTeacher::where('id', $validated['assignment_id'])
-            ->where('teacher_id', $teacher->id)
-            ->firstOrFail();
-
-        $exam = Exam::create([
-            'subject_id' => $assignment->subject_id,
-            'teacher_id' => $teacher->id,
-            'class_id' => $assignment->class_id,
-            'title' => $validated['title'],
-            'type' => $validated['type'],
-            'is_cbt' => $request->boolean('is_cbt', true),
-            'duration_minutes' => $validated['duration_minutes'],
-            'status' => 'pending',
-        ]);
+        $exam = Exam::create($request->toModelData());
 
         return redirect()
             ->route('guru.exams.show', $exam)
@@ -67,7 +45,7 @@ class ExamController extends Controller
 
     public function show(Exam $exam)
     {
-        $this->authorizeExam($exam);
+        $this->authorize('manage', $exam);
 
         $exam->load(['questions', 'subject', 'schoolClass']);
 
@@ -76,7 +54,7 @@ class ExamController extends Controller
 
     public function destroy(Exam $exam)
     {
-        $this->authorizeExam($exam);
+        $this->authorize('manage', $exam);
 
         $exam->delete();
 
@@ -87,7 +65,7 @@ class ExamController extends Controller
 
     public function resubmit(Exam $exam)
     {
-        $this->authorizeExam($exam);
+        $this->authorize('manage', $exam);
 
         $exam->update([
             'status' => 'pending',
@@ -101,10 +79,8 @@ class ExamController extends Controller
             ->with('status', 'Paket ujian berhasil diajukan ulang untuk direview admin.');
     }
 
-    private function authorizeExam(Exam $exam): void
+    private function currentTeacher()
     {
-        $teacher = Auth::user()->teacher;
-
-        abort_if(!$teacher || $exam->teacher_id !== $teacher->id, 403, 'Anda tidak memiliki akses ke ujian ini.');
+        return Auth::user()->teacher;
     }
 }

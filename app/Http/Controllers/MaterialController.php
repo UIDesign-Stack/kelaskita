@@ -12,13 +12,11 @@ class MaterialController extends Controller
     {
         $subjects = Subject::orderBy('name')->get();
 
-        $query = Material::with(['subject', 'teacher.user']);
-
-        if ($request->filled('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
-        }
-
-        $materials = $query->latest()->get();
+        $materials = Material::with(['subject', 'teacher.user'])
+            ->when($request->filled('subject_id'), fn ($q) => $q->where('subject_id', $request->subject_id))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('materials.index', compact('subjects', 'materials'));
     }

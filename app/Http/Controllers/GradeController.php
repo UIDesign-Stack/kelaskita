@@ -16,27 +16,22 @@ class GradeController extends Controller
         $subjects = Subject::orderBy('name')->get();
         $schoolYears = SchoolYear::orderByDesc('name')->get();
 
-        $query = Grade::with(['student.schoolClass', 'subject', 'teacher.user', 'schoolYear']);
+        $baseQuery = Grade::query()
+            ->when($request->filled('class_id'), function ($q) use ($request) {
+                $q->whereHas('student', fn ($sq) => $sq->where('class_id', $request->class_id));
+            })
+            ->when($request->filled('subject_id'), fn ($q) => $q->where('subject_id', $request->subject_id))
+            ->when($request->filled('school_year_id'), fn ($q) => $q->where('school_year_id', $request->school_year_id))
+            ->when($request->filled('semester'), fn ($q) => $q->where('semester', $request->semester));
 
-        if ($request->filled('class_id')) {
-            $query->whereHas('student', fn ($q) => $q->where('class_id', $request->class_id));
-        }
+        $averageScore = (clone $baseQuery)->avg('score');
+        $averageScore = $averageScore !== null ? round($averageScore, 1) : null;
 
-        if ($request->filled('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
-        }
-
-        if ($request->filled('school_year_id')) {
-            $query->where('school_year_id', $request->school_year_id);
-        }
-
-        if ($request->filled('semester')) {
-            $query->where('semester', $request->semester);
-        }
-
-        $grades = $query->latest()->get();
-
-        $averageScore = $grades->isNotEmpty() ? round($grades->avg('score'), 1) : null;
+        $grades = (clone $baseQuery)
+            ->with(['student.schoolClass', 'subject', 'teacher.user', 'schoolYear'])
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
 
         return view('grades.index', compact('classes', 'subjects', 'schoolYears', 'grades', 'averageScore'));
     }

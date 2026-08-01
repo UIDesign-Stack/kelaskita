@@ -16,4 +16,12 @@ class SchoolYear extends Model
     {
         return $this->hasMany(SchoolClass::class);
     }
+    
+    public static function deactivateOthersExcept(?int $exceptId = null): void
+    {
+        static::where('is_active', true)
+            ->when($exceptId, fn ($q) => $q->where('id', '!=', $exceptId))
+            ->update(['is_active' => false]);
+    }
+
 }

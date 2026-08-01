@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTeacherAttendanceRequest;
 use App\Models\Teacher;
 use App\Models\TeacherAttendance;
 use Illuminate\Http\Request;
@@ -12,28 +13,28 @@ class TeacherAttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = TeacherAttendance::with('teacher.user');
+        $baseQuery = TeacherAttendance::query()
+            ->when($request->filled('date_from'), fn ($q) => $q->whereDate('date', '>=', $request->date_from))
+            ->when($request->filled('date_to'), fn ($q) => $q->whereDate('date', '<=', $request->date_to));
 
-        if ($request->filled('date_from')) {
-            $query->whereDate('date', '>=', $request->date_from);
-        }
-
-        if ($request->filled('date_to')) {
-            $query->whereDate('date', '<=', $request->date_to);
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $records = $query->latest('date')->get();
+        $summary = (clone $baseQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         $summary = [
-            'hadir' => $records->where('status', 'hadir')->count(),
-            'izin' => $records->where('status', 'izin')->count(),
-            'sakit' => $records->where('status', 'sakit')->count(),
-            'alpa' => $records->where('status', 'alpa')->count(),
+            'hadir' => $summary['hadir'] ?? 0,
+            'izin' => $summary['izin'] ?? 0,
+            'sakit' => $summary['sakit'] ?? 0,
+            'alpa' => $summary['alpa'] ?? 0,
         ];
+
+        $records = (clone $baseQuery)
+            ->with('teacher.user')
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->latest('date')
+            ->paginate(20)
+            ->withQueryString();
 
         return view('teacher-attendances.index', compact('records', 'summary'));
     }
@@ -49,13 +50,9 @@ class TeacherAttendanceController extends Controller
         return view('teacher-attendances.create', compact('teachers', 'date', 'existing'));
     }
 
-    public function store(Request $request)
+    public function store(StoreTeacherAttendanceRequest $request)
     {
-        $validated = $request->validate([
-            'date' => ['required', 'date'],
-            'status' => ['required', 'array'],
-            'status.*' => ['required', 'in:hadir,izin,sakit,alpa'],
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated) {
             foreach ($validated['status'] as $teacherId => $status) {

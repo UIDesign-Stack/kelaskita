@@ -22,16 +22,18 @@ class ReportCardController extends Controller
         $students = collect();
 
         if ($request->filled('class_id') && $request->filled('semester') && $request->filled('school_year_id')) {
+            
+            $reportCards = ReportCard::where('class_id', $request->class_id)
+                ->where('semester', $request->semester)
+                ->where('school_year_id', $request->school_year_id)
+                ->get()
+                ->keyBy('student_id');
+
             $students = Student::where('class_id', $request->class_id)
                 ->orderBy('name')
                 ->get()
-                ->map(function ($student) use ($request) {
-                    $student->reportCard = ReportCard::where('student_id', $student->id)
-                        ->where('semester', $request->semester)
-                        ->where('school_year_id', $request->school_year_id)
-                        ->first();
-
-                    return $student;
+                ->each(function ($student) use ($reportCards) {
+                    $student->reportCard = $reportCards->get($student->id);
                 });
         }
 
@@ -40,7 +42,7 @@ class ReportCardController extends Controller
 
     public function show(Student $student, Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'semester' => ['required', 'in:ganjil,genap'],
             'school_year_id' => ['required', 'exists:school_years,id'],
         ]);
@@ -48,8 +50,8 @@ class ReportCardController extends Controller
         $reportCard = ReportCard::firstOrCreate(
             [
                 'student_id' => $student->id,
-                'semester' => $request->semester,
-                'school_year_id' => $request->school_year_id,
+                'semester' => $validated['semester'],
+                'school_year_id' => $validated['school_year_id'],
             ],
             [
                 'class_id' => $student->class_id,
@@ -57,28 +59,15 @@ class ReportCardController extends Controller
             ]
         );
 
-        // Generate ulang nilai draft dari tabel grades (hanya jika masih draft)
+        
         if ($reportCard->status === 'draft') {
-            $averages = Grade::where('student_id', $student->id)
-                ->where('semester', $request->semester)
-                ->where('school_year_id', $request->school_year_id)
-                ->select('subject_id', DB::raw('AVG(score) as avg_score'))
-                ->groupBy('subject_id')
-                ->get();
-
-            foreach ($averages as $row) {
-                ReportCardDetail::updateOrCreate(
-                    ['report_card_id' => $reportCard->id, 'subject_id' => $row->subject_id],
-                    [
-                        'final_score' => round($row->avg_score, 1),
-                        'predicate' => $this->predicate($row->avg_score),
-                    ]
-                );
-            }
+            $this->refreshDraftScores($reportCard, $student, $validated);
         }
 
         $reportCard->load(['details.subject', 'student', 'schoolYear', 'schoolClass']);
-        $overallAverage = $reportCard->details->isNotEmpty() ? round($reportCard->details->avg('final_score'), 1) : null;
+        $overallAverage = $reportCard->details->isNotEmpty()
+            ? round($reportCard->details->avg('final_score'), 1)
+            : null;
 
         return view('report-cards.show', compact('reportCard', 'overallAverage'));
     }
@@ -98,6 +87,26 @@ class ReportCardController extends Controller
                 'school_year_id' => $reportCard->school_year_id,
             ])
             ->with('status', 'Rapor berhasil difinalisasi dan terkunci.');
+    }
+
+    private function refreshDraftScores(ReportCard $reportCard, Student $student, array $filters): void
+    {
+        $averages = Grade::where('student_id', $student->id)
+            ->where('semester', $filters['semester'])
+            ->where('school_year_id', $filters['school_year_id'])
+            ->select('subject_id', DB::raw('AVG(score) as avg_score'))
+            ->groupBy('subject_id')
+            ->get();
+
+        foreach ($averages as $row) {
+            ReportCardDetail::updateOrCreate(
+                ['report_card_id' => $reportCard->id, 'subject_id' => $row->subject_id],
+                [
+                    'final_score' => round($row->avg_score, 1),
+                    'predicate' => $this->predicate($row->avg_score),
+                ]
+            );
+        }
     }
 
     private function predicate(float $score): string

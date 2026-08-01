@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RejectExamRequest;
 use App\Models\Exam;
 use App\Models\SchoolClass;
 use App\Models\Subject;
@@ -15,27 +16,28 @@ class ExamReviewController extends Controller
         $classes = SchoolClass::orderBy('name')->get();
         $subjects = Subject::orderBy('name')->get();
 
-        $query = Exam::with(['subject', 'schoolClass', 'teacher.user'])->withCount('questions');
+        $baseQuery = Exam::query()
+            ->when($request->filled('class_id'), fn ($q) => $q->where('class_id', $request->class_id))
+            ->when($request->filled('subject_id'), fn ($q) => $q->where('subject_id', $request->subject_id));
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('class_id')) {
-            $query->where('class_id', $request->class_id);
-        }
-
-        if ($request->filled('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
-        }
-
-        $exams = $query->latest()->get();
+        $summary = (clone $baseQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         $summary = [
-            'pending' => (clone $query)->where('status', 'pending')->count(),
-            'approved' => Exam::where('status', 'approved')->count(),
-            'rejected' => Exam::where('status', 'rejected')->count(),
+            'pending' => $summary['pending'] ?? 0,
+            'approved' => $summary['approved'] ?? 0,
+            'rejected' => $summary['rejected'] ?? 0,
         ];
+
+        $exams = (clone $baseQuery)
+            ->with(['subject', 'schoolClass', 'teacher.user'])
+            ->withCount('questions')
+            ->when($request->filled('status'), fn ($q) => $q->where('status', $request->status))
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('exam-review.index', compact('classes', 'subjects', 'exams', 'summary'));
     }
@@ -61,15 +63,11 @@ class ExamReviewController extends Controller
             ->with('status', 'Paket ujian "' . $exam->title . '" berhasil disetujui.');
     }
 
-    public function reject(Exam $exam, Request $request)
+    public function reject(Exam $exam, RejectExamRequest $request)
     {
-        $validated = $request->validate([
-            'rejection_reason' => ['required', 'string', 'max:500'],
-        ]);
-
         $exam->update([
             'status' => 'rejected',
-            'rejection_reason' => $validated['rejection_reason'],
+            'rejection_reason' => $request->validated('rejection_reason'),
             'reviewed_by' => Auth::id(),
             'reviewed_at' => now(),
         ]);

@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSchoolYearRequest;
+use App\Http\Requests\UpdateSchoolYearRequest;
 use App\Models\SchoolYear;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SchoolYearController extends Controller
@@ -20,25 +21,14 @@ class SchoolYearController extends Controller
         return view('school-years.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreSchoolYearRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:20'],
-            'semester' => ['required', 'in:ganjil,genap'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
-
-        DB::transaction(function () use ($validated, $request) {
+        DB::transaction(function () use ($request) {
             if ($request->boolean('is_active')) {
-                // Pastikan cuma 1 tahun ajaran yang aktif dalam satu waktu
-                SchoolYear::where('is_active', true)->update(['is_active' => false]);
+                SchoolYear::deactivateOthersExcept();
             }
 
-            SchoolYear::create([
-                'name' => $validated['name'],
-                'semester' => $validated['semester'],
-                'is_active' => $request->boolean('is_active'),
-            ]);
+            SchoolYear::create($request->toModelData());
         });
 
         return redirect()
@@ -51,24 +41,14 @@ class SchoolYearController extends Controller
         return view('school-years.edit', compact('schoolYear'));
     }
 
-    public function update(Request $request, SchoolYear $schoolYear)
+    public function update(UpdateSchoolYearRequest $request, SchoolYear $schoolYear)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:20'],
-            'semester' => ['required', 'in:ganjil,genap'],
-            'is_active' => ['nullable', 'boolean'],
-        ]);
-
-        DB::transaction(function () use ($validated, $request, $schoolYear) {
+        DB::transaction(function () use ($request, $schoolYear) {
             if ($request->boolean('is_active')) {
-                SchoolYear::where('id', '!=', $schoolYear->id)->where('is_active', true)->update(['is_active' => false]);
+                SchoolYear::deactivateOthersExcept($schoolYear->id);
             }
 
-            $schoolYear->update([
-                'name' => $validated['name'],
-                'semester' => $validated['semester'],
-                'is_active' => $request->boolean('is_active'),
-            ]);
+            $schoolYear->update($request->toModelData());
         });
 
         return redirect()
@@ -80,11 +60,7 @@ class SchoolYearController extends Controller
     {
         if ($schoolYear->classes()->exists()) {
             return back()->withErrors([
-                'delete' => 'Tahun ajaran "' . $schoolYear->name . 
-                '" masih memiliki data kelas. Hapus atau pindahkan 
-                kelas-kelas tersebut terlebih dahulu 
-                (menghapus tahun ajaran akan ikut menghapus semua 
-                kelas di dalamnya).',
+                'delete' => 'Tahun ajaran "' . $schoolYear->name . '" masih memiliki data kelas. Hapus atau pindahkan kelas-kelas tersebut terlebih dahulu (menghapus tahun ajaran akan ikut menghapus semua kelas di dalamnya).',
             ]);
         }
 

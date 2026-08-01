@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreGradeInputRequest;
 use App\Models\ClassSubjectTeacher;
 use App\Models\Grade;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class GradeInputController extends Controller
 {
@@ -23,14 +24,13 @@ class GradeInputController extends Controller
 
     public function create(ClassSubjectTeacher $assignment, Request $request)
     {
-        $this->authorizeAssignment($assignment);
+        $this->authorize('manage', $assignment);
 
         $assignment->load(['schoolClass.students' => fn ($q) => $q->orderBy('name'), 'subject', 'schoolYear']);
 
         $semester = $request->query('semester', 'ganjil');
         $type = $request->query('type', 'tugas');
 
-        // Ambil nilai yang sudah pernah diinput untuk kombinasi semester+type ini
         $existingGrades = Grade::where('subject_id', $assignment->subject_id)
             ->where('teacher_id', $assignment->teacher_id)
             ->where('school_year_id', $assignment->school_year_id)
@@ -42,16 +42,9 @@ class GradeInputController extends Controller
         return view('grade-input.create', compact('assignment', 'semester', 'type', 'existingGrades'));
     }
 
-    public function store(ClassSubjectTeacher $assignment, Request $request)
+    public function store(ClassSubjectTeacher $assignment, StoreGradeInputRequest $request)
     {
-        $this->authorizeAssignment($assignment);
-
-        $validated = $request->validate([
-            'semester' => ['required', 'in:ganjil,genap'],
-            'type' => ['required', 'in:tugas,ulangan_harian,uts,uas'],
-            'scores' => ['required', 'array'],
-            'scores.*' => ['nullable', 'numeric', 'min:0', 'max:100'],
-        ]);
+        $validated = $request->validated();
 
         DB::transaction(function () use ($validated, $assignment) {
             foreach ($validated['scores'] as $studentId => $score) {
@@ -80,12 +73,5 @@ class GradeInputController extends Controller
                 'type' => $validated['type'],
             ])
             ->with('status', 'Nilai berhasil disimpan.');
-    }
-
-    private function authorizeAssignment(ClassSubjectTeacher $assignment): void
-    {
-        $teacher = Auth::user()->teacher;
-
-        abort_if(!$teacher || $assignment->teacher_id !== $teacher->id, 403, 'Anda tidak memiliki akses ke kelas/mapel ini.');
     }
 }

@@ -2,19 +2,28 @@
 
 namespace App\Http\Controllers;
 
+
+use App\Models\Teacher;
 use App\Models\SchoolClass;
 use App\Models\SchoolYear;
-use App\Models\Teacher;
-use Illuminate\Http\Request;
+use App\Services\WaliKelasRoleService;;
+use App\Http\Requests\StoreSchoolClassRequest;
+use App\Http\Requests\UpdateSchoolClassRequest;
 
 class ClassController extends Controller
 {
+
+    public function __construct(private WaliKelasRoleService $waliKelasRoleService)
+    {
+    }
+
     public function index()
     {
         $classes = SchoolClass::with(['schoolYear', 'homeroomTeacher.user'])
             ->withCount('students')
             ->latest()
-            ->get();
+            ->paginate(15)
+            ->withQueryString();
 
         return view('classes.index', compact('classes'));
     }
@@ -27,30 +36,11 @@ class ClassController extends Controller
         return view('classes.create', compact('schoolYears', 'teachers'));
     }
 
-    public function store(Request $request)
+    public function store(StoreSchoolClassRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:50'],
-            'grade_level' => ['required', 'string', 'max:20'],
-            'school_year_id' => ['required', 'exists:school_years,id'],
-            'homeroom_teacher_id' => ['nullable', 'exists:teachers,id'],
-        ]);
+        $class = SchoolClass::create($request->validated());
 
-        if (!empty($validated['homeroom_teacher_id'])) {
-            $alreadyHomeroom = SchoolClass::where('homeroom_teacher_id', $validated['homeroom_teacher_id'])
-                ->where('school_year_id', $validated['school_year_id'])
-                ->exists();
-
-            if ($alreadyHomeroom) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['homeroom_teacher_id' => 'Guru ini sudah menjadi wali kelas lain di tahun ajaran yang sama.']);
-            }
-        }
-
-        $class = SchoolClass::create($validated);
-
-        $this->syncWaliKelasRole(null, $class->homeroom_teacher_id);
+        $this->waliKelasRoleService->sync(null, $class->homeroom_teacher_id);
 
         return redirect()
             ->route('data-master.classes.index')
@@ -78,33 +68,13 @@ class ClassController extends Controller
         return view('classes.edit', compact('class', 'schoolYears', 'teachers'));
     }
 
-    public function update(Request $request, SchoolClass $class)
+    public function update(UpdateSchoolClassRequest $request, SchoolClass $class)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:50'],
-            'grade_level' => ['required', 'string', 'max:20'],
-            'school_year_id' => ['required', 'exists:school_years,id'],
-            'homeroom_teacher_id' => ['nullable', 'exists:teachers,id'],
-        ]);
-
-        if (!empty($validated['homeroom_teacher_id'])) {
-            $alreadyHomeroom = SchoolClass::where('homeroom_teacher_id', $validated['homeroom_teacher_id'])
-                ->where('school_year_id', $validated['school_year_id'])
-                ->where('id', '!=', $class->id)
-                ->exists();
-
-            if ($alreadyHomeroom) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['homeroom_teacher_id' => 'Guru ini sudah menjadi wali kelas lain di tahun ajaran yang sama.']);
-            }
-        }
-
         $oldTeacherId = $class->homeroom_teacher_id;
 
-        $class->update($validated);
+        $class->update($request->validated());
 
-        $this->syncWaliKelasRole($oldTeacherId, $class->homeroom_teacher_id);
+        $this->waliKelasRoleService->sync($oldTeacherId, $class->homeroom_teacher_id);
 
         return redirect()
             ->route('data-master.classes.index')
@@ -121,34 +91,12 @@ class ClassController extends Controller
 
         $oldTeacherId = $class->homeroom_teacher_id;
 
-   
         $class->delete();
 
-        $this->syncWaliKelasRole($oldTeacherId, null);
+        $this->waliKelasRoleService->sync($oldTeacherId, null);
 
         return redirect()
             ->route('data-master.classes.index')
             ->with('status', 'Data kelas berhasil dihapus.');
-    }
-
-   
-    private function syncWaliKelasRole(?int $oldTeacherId, ?int $newTeacherId): void
-    {
-        if ($oldTeacherId && $oldTeacherId !== $newTeacherId) {
-            $stillHomeroom = SchoolClass::where('homeroom_teacher_id', $oldTeacherId)->exists();
-
-            if (!$stillHomeroom) {
-                $oldTeacher = Teacher::with('user')->find($oldTeacherId);
-                $oldTeacher?->user?->removeRole('wali_kelas');
-            }
-        }
-
-        if ($newTeacherId) {
-            $newTeacher = Teacher::with('user')->find($newTeacherId);
-
-            if ($newTeacher?->user && !$newTeacher->user->hasRole('wali_kelas')) {
-                $newTeacher->user->assignRole('wali_kelas');
-            }
-        }
     }
 }

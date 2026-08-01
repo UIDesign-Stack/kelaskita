@@ -14,17 +14,16 @@ class DocumentController extends Controller
         $subjects = Subject::orderBy('name')->get();
         $documentTypes = DocumentType::orderBy('name')->get();
 
-        $query = TeachingDocument::with(['subject', 'teacher.user', 'documentType']);
-
-        if ($request->filled('document_type_id')) {
-            $query->where('document_type_id', $request->document_type_id);
-        }
-
-        if ($request->filled('subject_id')) {
-            $query->where('subject_id', $request->subject_id);
-        }
-
-        $documents = $query->latest()->get();
+        $documents = TeachingDocument::with(['subject', 'teacher.user', 'documentType'])
+            ->when($request->filled('document_type_id'), function ($query) use ($request) {
+                $query->where('document_type_id', $request->document_type_id);
+            })
+            ->when($request->filled('subject_id'), function ($query) use ($request) {
+                $query->where('subject_id', $request->subject_id);
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('documents.index', compact('subjects', 'documentTypes', 'documents'));
     }

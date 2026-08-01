@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSubstituteTeacherRequest;
 use App\Models\SchoolClass;
-use App\Models\SubstituteTeacher;
 use App\Models\Subject;
+use App\Models\SubstituteTeacher;
 use App\Models\Teacher;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SubstituteTeacherController extends Controller
@@ -15,7 +15,8 @@ class SubstituteTeacherController extends Controller
     {
         $logs = SubstituteTeacher::with(['originalTeacher.user', 'substituteTeacher.user', 'schoolClass', 'subject'])
             ->latest('date')
-            ->get();
+            ->paginate(20)
+            ->withQueryString();
 
         return view('substitute-teachers.index', compact('logs'));
     }
@@ -29,19 +30,10 @@ class SubstituteTeacherController extends Controller
         return view('substitute-teachers.create', compact('teachers', 'classes', 'subjects'));
     }
 
-    public function store(Request $request)
+    public function store(StoreSubstituteTeacherRequest $request)
     {
-        $validated = $request->validate([
-            'original_teacher_id' => ['required', 'exists:teachers,id'],
-            'substitute_teacher_id' => ['required', 'exists:teachers,id', 'different:original_teacher_id'],
-            'class_id' => ['required', 'exists:classes,id'],
-            'subject_id' => ['nullable', 'exists:subjects,id'],
-            'date' => ['required', 'date'],
-            'notes' => ['nullable', 'string', 'max:255'],
-        ]);
-
         SubstituteTeacher::create([
-            ...$validated,
+            ...$request->validated(),
             'recorded_by' => Auth::id(),
         ]);
 

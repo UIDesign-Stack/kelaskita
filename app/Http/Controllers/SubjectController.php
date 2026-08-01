@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSubjectRequest;
+use App\Http\Requests\UpdateSubjectRequest;
 use App\Models\Subject;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class SubjectController extends Controller
 {
@@ -20,14 +20,9 @@ class SubjectController extends Controller
         return view('subjects.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreSubjectRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:20', Rule::unique('subjects', 'code')],
-        ]);
-
-        Subject::create($validated);
+        Subject::create($request->validated());
 
         return redirect()
             ->route('data-master.subjects.index')
@@ -39,14 +34,9 @@ class SubjectController extends Controller
         return view('subjects.edit', compact('subject'));
     }
 
-    public function update(Request $request, Subject $subject)
+    public function update(UpdateSubjectRequest $request, Subject $subject)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:20', Rule::unique('subjects', 'code')->ignore($subject->id)],
-        ]);
-
-        $subject->update($validated);
+        $subject->update($request->validated());
 
         return redirect()
             ->route('data-master.subjects.index')
