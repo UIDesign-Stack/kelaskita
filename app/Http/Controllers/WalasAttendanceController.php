@@ -71,8 +71,6 @@ class WalasAttendanceController extends Controller
         if ($class) {
             $students = $class->students()->orderBy('name')->get();
 
-            // 1 query untuk semua siswa sekaligus (student_id + status),
-            // dibanding query terpisah per siswa di dalam map().
             $counts = Attendance::whereIn('student_id', $students->pluck('id'))
                 ->whereNull('subject_id')
                 ->whereDate('date', '>=', $dateFrom)
