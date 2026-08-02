@@ -18,6 +18,13 @@
         </div>
     @endif
 
+    @if ($errors->has('delete'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $errors->first('delete') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <div class="table-responsive">
@@ -45,15 +52,19 @@
                                     @endif
                                 </td>
                                 <td>{{ $class->students_count }} siswa</td>
-                                <td>
+                                <td class="text-nowrap">
                                     <a href="{{ route('data-master.classes.show', $class) }}" class="btn btn-sm btn-outline-secondary">Detail</a>
                                     <a href="{{ route('data-master.classes.edit', $class) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                    @if ($errors->has('delete'))
-                                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                            {{ $errors->first('delete') }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                        </div>
-                                    @endif
+
+                                    {{-- Tombol delete: sebelumnya error 'delete' di-handle tapi form/tombolnya belum ada. --}}
+                                    <form action="{{ route('data-master.classes.destroy', $class) }}"
+                                          method="POST"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Yakin ingin menghapus kelas {{ $class->name }}?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach

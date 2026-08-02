@@ -54,6 +54,10 @@
                             @enderror
                         </div>
                         <div class="form-check mb-3">
+                            {{-- Hidden fallback: kalau checkbox tidak dicentang, browser tidak mengirim
+                                 field ini sama sekali. Tanpa ini, controller yang pakai $request->input()
+                                 (bukan ->boolean()) bisa salah menyimpan nilai lama. --}}
+                            <input type="hidden" name="requires_semester" value="0">
                             <input type="checkbox" name="requires_semester" value="1" class="form-check-input"
                                 id="requires_semester" {{ old('requires_semester') ? 'checked' : '' }}>
                             <label class="form-check-label" for="requires_semester">
@@ -84,6 +88,9 @@
                             </thead>
                             <tbody>
                                 @foreach ($documentTypes as $type)
+                                    @php
+                                        $isEditingThisRow = old('type_id') == $type->id;
+                                    @endphp
                                     <tr>
                                         <td>{{ $type->name }}</td>
                                         <td><code>{{ $type->code }}</code></td>
@@ -110,24 +117,41 @@
                                             @endif
                                         </td>
                                     </tr>
-                                    <tr class="collapse" id="edit-{{ $type->id }}">
+                                    <tr class="collapse @if ($isEditingThisRow) show @endif" id="edit-{{ $type->id }}">
                                         <td colspan="6" class="bg-light">
+                                            @if ($isEditingThisRow && $errors->any())
+                                                <div class="alert alert-danger py-2 mb-2">
+                                                    {{ $errors->first() }}
+                                                </div>
+                                            @endif
                                             <form method="POST" action="{{ route('data-master.document-types.update', $type) }}"
                                                 class="row g-2 align-items-end py-2">
                                                 @csrf
                                                 @method('PUT')
+                                                <input type="hidden" name="type_id" value="{{ $type->id }}">
                                                 <div class="col-md-4">
-                                                    <input type="text" name="name" value="{{ $type->name }}"
-                                                        class="form-control form-control-sm" required>
+                                                    <input type="text" name="name"
+                                                        value="{{ $isEditingThisRow ? old('name') : $type->name }}"
+                                                        class="form-control form-control-sm @if ($isEditingThisRow) @error('name') is-invalid @enderror @endif"
+                                                        required>
+                                                    @if ($isEditingThisRow)
+                                                        @error('name')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    @endif
                                                 </div>
                                                 <div class="col-md-3 form-check">
+                                                    <input type="hidden" name="requires_semester" value="0">
                                                     <input type="checkbox" name="requires_semester" value="1"
-                                                        class="form-check-input" {{ $type->requires_semester ? 'checked' : '' }}>
+                                                        class="form-check-input"
+                                                        {{ ($isEditingThisRow ? old('requires_semester') : $type->requires_semester) ? 'checked' : '' }}>
                                                     <label class="form-check-label small">Butuh semester</label>
                                                 </div>
                                                 <div class="col-md-3 form-check">
+                                                    <input type="hidden" name="is_active" value="0">
                                                     <input type="checkbox" name="is_active" value="1"
-                                                        class="form-check-input" {{ $type->is_active ? 'checked' : '' }}>
+                                                        class="form-check-input"
+                                                        {{ ($isEditingThisRow ? old('is_active') : $type->is_active) ? 'checked' : '' }}>
                                                     <label class="form-check-label small">Aktif</label>
                                                 </div>
                                                 <div class="col-md-2">

@@ -69,7 +69,7 @@
                                 <tr>
                                     <th>NIS</th>
                                     <th>Nama Siswa</th>
-                                    <th style="width: 150px;">Nilai (0-100)</th>
+                                    <th style="width: 180px;">Nilai (0-100)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -79,8 +79,12 @@
                                         <td>{{ $student->name }}</td>
                                         <td>
                                             <input type="number" name="scores[{{ $student->id }}]" min="0" max="100"
-                                                step="0.1" class="form-control form-control-sm"
+                                                step="0.1"
+                                                class="form-control form-control-sm @error('scores.' . $student->id) is-invalid @enderror"
                                                 value="{{ old('scores.' . $student->id, $existingGrades[$student->id] ?? '') }}">
+                                            @error('scores.' . $student->id)
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </td>
                                     </tr>
                                 @endforeach

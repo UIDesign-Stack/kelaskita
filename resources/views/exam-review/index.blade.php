@@ -4,6 +4,14 @@
 
 @section('content')
 
+    @php
+        $statuses = [
+            'pending'  => ['label' => 'Menunggu Persetujuan', 'badge_label' => 'Menunggu',  'color' => 'warning'],
+            'approved' => ['label' => 'Disetujui',            'badge_label' => 'Disetujui', 'color' => 'success'],
+            'rejected' => ['label' => 'Ditolak',              'badge_label' => 'Ditolak',   'color' => 'danger'],
+        ];
+    @endphp
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Bank Soal Ujian (Review Admin)</h4>
     </div>
@@ -16,24 +24,16 @@
     @endif
 
     <div class="row g-3 mb-3">
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Menunggu Persetujuan</h6>
-                <h3 class="mb-0 text-warning">{{ $summary['pending'] }}</h3>
-            </div></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Disetujui</h6>
-                <h3 class="mb-0 text-success">{{ $summary['approved'] }}</h3>
-            </div></div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Ditolak</h6>
-                <h3 class="mb-0 text-danger">{{ $summary['rejected'] }}</h3>
-            </div></div>
-        </div>
+        @foreach ($statuses as $value => $status)
+            <div class="col-md-4">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-1">{{ $status['label'] }}</h6>
+                        <h3 class="mb-0 text-{{ $status['color'] }}">{{ $summary[$value] ?? 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
 
     <div class="card shadow-sm border-0 mb-3">
@@ -43,9 +43,11 @@
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
                         <option value="">Semua</option>
-                        <option value="pending" @selected(request('status') == 'pending')>Menunggu Persetujuan</option>
-                        <option value="approved" @selected(request('status') == 'approved')>Disetujui</option>
-                        <option value="rejected" @selected(request('status') == 'rejected')>Ditolak</option>
+                        @foreach ($statuses as $value => $status)
+                            <option value="{{ $value }}" @selected(request('status') == $value)>
+                                {{ $status['label'] }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -93,6 +95,9 @@
                         </thead>
                         <tbody>
                             @foreach ($exams as $exam)
+                                @php
+                                    $examStatus = $statuses[$exam->status] ?? ['color' => 'secondary', 'badge_label' => ucfirst($exam->status)];
+                                @endphp
                                 <tr>
                                     <td>{{ $exam->title }}</td>
                                     <td>{{ $exam->teacher->user->name ?? '-' }}</td>
@@ -100,15 +105,7 @@
                                     <td>{{ $exam->subject->name ?? '-' }}</td>
                                     <td>{{ $exam->questions_count }}</td>
                                     <td>
-                                        @php
-                                            $statusColor = match($exam->status) {
-                                                'approved' => 'success', 'rejected' => 'danger', default => 'warning',
-                                            };
-                                            $statusLabel = match($exam->status) {
-                                                'approved' => 'Disetujui', 'rejected' => 'Ditolak', default => 'Menunggu',
-                                            };
-                                        @endphp
-                                        <span class="badge text-bg-{{ $statusColor }}">{{ $statusLabel }}</span>
+                                        <span class="badge text-bg-{{ $examStatus['color'] }}">{{ $examStatus['badge_label'] }}</span>
                                     </td>
                                     <td>
                                         <a href="{{ route('ujian.exam-review.show', $exam) }}" class="btn btn-sm btn-outline-primary">

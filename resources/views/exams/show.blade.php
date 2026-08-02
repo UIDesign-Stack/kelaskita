@@ -23,16 +23,16 @@
     @endif
 
     @php
-        $statusColor = match($exam->status) {
-            'approved' => 'success', 'rejected' => 'danger', default => 'warning',
-        };
-        $statusLabel = match($exam->status) {
-            'approved' => 'Disetujui Admin', 'rejected' => 'Ditolak Admin', default => 'Menunggu Persetujuan Admin',
-        };
+        $statuses = [
+            'pending'  => ['label' => 'Menunggu Persetujuan Admin', 'color' => 'warning'],
+            'approved' => ['label' => 'Disetujui Admin',            'color' => 'success'],
+            'rejected' => ['label' => 'Ditolak Admin',              'color' => 'danger'],
+        ];
+        $examStatus = $statuses[$exam->status] ?? ['label' => ucfirst($exam->status), 'color' => 'secondary'];
     @endphp
 
-    <div class="alert alert-{{ $statusColor }} alert-dismissible fade show" role="alert">
-        Status: <strong>{{ $statusLabel }}</strong>
+    <div class="alert alert-{{ $examStatus['color'] }} alert-dismissible fade show" role="alert">
+        Status: <strong>{{ $examStatus['label'] }}</strong>
         @if ($exam->status === 'rejected' && $exam->rejection_reason)
             <div class="mt-1">
                 <strong>Alasan ditolak:</strong> {{ $exam->rejection_reason }}
@@ -52,6 +52,12 @@
             <span></span>
         @endif
         <a href="{{ route('guru.exams.questions.create', $exam) }}" class="btn btn-primary btn-sm">+ Tambah Soal</a>
+        <a href="{{ route('guru.exams.results.index', $exam) }}" class="btn btn-outline-primary btn-sm">
+            Lihat Hasil & Nilai
+        </a>
+        <a href="{{ route('guru.exams.analysis', $exam) }}" class="btn btn-outline-info btn-sm">
+            Analisis Butir Soal
+        </a>
     </div>
 
     @if ($exam->questions->isEmpty())

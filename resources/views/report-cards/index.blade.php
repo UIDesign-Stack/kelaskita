@@ -67,6 +67,8 @@
                                     <td>{{ $student->nis }}</td>
                                     <td>{{ $student->name }}</td>
                                     <td>
+                                        {{-- Sudah dikonfirmasi: reportCard di-scope ke semester +
+                                             school_year_id yang difilter (lihat ReportCardController@index). --}}
                                         @if (!$student->reportCard)
                                             <span class="badge text-bg-secondary">Belum Dibuat</span>
                                         @elseif ($student->reportCard->status === 'final')
@@ -90,6 +92,10 @@
         </div>
     @elseif (request()->has('class_id'))
         <div class="alert alert-warning">Tidak ada siswa di kelas ini.</div>
+    @else
+        <div class="alert alert-light border text-muted mb-0">
+            Pilih kelas, semester, dan tahun ajaran di atas, lalu klik "Tampilkan" untuk melihat daftar rapor siswa.
+        </div>
     @endif
 
 @endsection

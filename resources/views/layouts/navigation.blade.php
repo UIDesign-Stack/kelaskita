@@ -121,7 +121,6 @@
             'Ujian & Evaluasi' => [
                 'Buat Soal Ujian' => route('guru.exams.index'),
                 'CBT / Kuis' => '#',
-                'Analisis Butir Soal' => '#',
             ],
             'Presensi' => [
                 'Presensi per Mapel' => route('guru.attendance.index'),
@@ -140,7 +139,7 @@
                 'Jadwal Pelajaran' => '#',
                 'Nilai & Rapor' => '#',
                 'Materi Ajar' => '#',
-                'Ujian / Kuis' => '#',
+                'Ujian / Kuis' => route('siswa.exams.index'),
             ],
             'Administrasi' => [
                 'Ajukan Surat Izin' => '#',

@@ -56,6 +56,12 @@ class ExamController extends Controller
     {
         $this->authorize('manage', $exam);
 
+        abort_if(
+            $exam->results()->exists(),
+            403,
+            'Tidak bisa menghapus paket ujian yang sudah pernah dikerjakan siswa.'
+        );
+
         $exam->delete();
 
         return redirect()
@@ -66,6 +72,12 @@ class ExamController extends Controller
     public function resubmit(Exam $exam)
     {
         $this->authorize('manage', $exam);
+
+        abort_if(
+            $exam->status !== 'rejected',
+            403,
+            'Hanya paket ujian berstatus ditolak yang bisa diajukan ulang.'
+        );
 
         $exam->update([
             'status' => 'pending',

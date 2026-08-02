@@ -17,16 +17,16 @@
     </div>
 
     @php
-        $statusColor = match($exam->status) {
-            'approved' => 'success', 'rejected' => 'danger', default => 'warning',
-        };
-        $statusLabel = match($exam->status) {
-            'approved' => 'Disetujui', 'rejected' => 'Ditolak', default => 'Menunggu Persetujuan',
-        };
+        $statuses = [
+            'pending'  => ['label' => 'Menunggu Persetujuan', 'color' => 'warning'],
+            'approved' => ['label' => 'Disetujui',            'color' => 'success'],
+            'rejected' => ['label' => 'Ditolak',              'color' => 'danger'],
+        ];
+        $examStatus = $statuses[$exam->status] ?? ['label' => ucfirst($exam->status), 'color' => 'secondary'];
     @endphp
 
-    <div class="alert alert-{{ $statusColor }}">
-        Status saat ini: <strong>{{ $statusLabel }}</strong>
+    <div class="alert alert-{{ $examStatus['color'] }}">
+        Status saat ini: <strong>{{ $examStatus['label'] }}</strong>
         @if ($exam->status !== 'pending')
             — oleh {{ $exam->reviewedBy->name ?? '-' }} pada {{ $exam->reviewed_at?->translatedFormat('d M Y H:i') }}
         @endif

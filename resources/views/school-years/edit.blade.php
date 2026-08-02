@@ -13,6 +13,11 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
+            @php
+                $hasPreviousSubmission = count(old()) > 0;
+                $isActiveChecked = $hasPreviousSubmission ? old('is_active') : $schoolYear->is_active;
+            @endphp
+
             <form method="POST" action="{{ route('data-master.school-years.update', $schoolYear) }}">
                 @csrf
                 @method('PUT')
@@ -41,8 +46,9 @@
 
                     <div class="col-12">
                         <div class="form-check">
+                            <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" id="is_active" name="is_active" value="1"
-                                class="form-check-input" {{ old('is_active', $schoolYear->is_active) ? 'checked' : '' }}>
+                                class="form-check-input" {{ $isActiveChecked ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_active">
                                 Jadikan tahun ajaran aktif
                             </label>

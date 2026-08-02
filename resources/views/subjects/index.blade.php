@@ -33,6 +33,7 @@
                         <tr>
                             <th>Kode</th>
                             <th>Nama Mata Pelajaran</th>
+                            <th>KKM</th>
                             <th>Dipakai di Jadwal</th>
                             <th>Aksi</th>
                         </tr>
@@ -42,6 +43,7 @@
                             <tr>
                                 <td><span class="badge text-bg-secondary">{{ $subject->code }}</span></td>
                                 <td>{{ $subject->name }}</td>
+                                <td>{{ $subject->kkm }}</td>
                                 <td>{{ $subject->class_subject_teachers_count }} kelas</td>
                                 <td>
                                     <a href="{{ route('data-master.subjects.edit', $subject) }}"

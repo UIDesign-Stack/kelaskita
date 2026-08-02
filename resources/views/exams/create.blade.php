@@ -16,6 +16,11 @@
                     Anda belum ditugaskan mengajar di kelas/mapel manapun.
                 </div>
             @else
+                @php
+                    $hasPreviousSubmission = count(old()) > 0;
+                    $isCbtChecked = $hasPreviousSubmission ? old('is_cbt') : true;
+                @endphp
+
                 <form method="POST" action="{{ route('guru.exams.store') }}">
                     @csrf
 
@@ -71,8 +76,11 @@
 
                         <div class="col-12">
                             <div class="form-check">
+                                {{-- Hidden fallback: kalau di-uncheck, field tetap terkirim sebagai 0
+                                     alih-alih hilang total dari request. --}}
+                                <input type="hidden" name="is_cbt" value="0">
                                 <input type="checkbox" id="is_cbt" name="is_cbt" value="1" class="form-check-input"
-                                    {{ old('is_cbt', true) ? 'checked' : '' }}>
+                                    {{ $isCbtChecked ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_cbt">
                                     Ujian dikerjakan online (CBT)
                                 </label>

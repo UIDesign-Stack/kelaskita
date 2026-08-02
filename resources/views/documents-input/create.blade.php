@@ -105,11 +105,14 @@
         document.addEventListener('DOMContentLoaded', function () {
             const typeSelect = document.getElementById('document_type_id');
             const semesterField = document.getElementById('semester-field');
+            const semesterSelect = document.getElementById('semester');
 
             function toggleSemester() {
                 const selected = typeSelect.options[typeSelect.selectedIndex];
                 const needsSemester = selected?.dataset.requiresSemester === '1';
+
                 semesterField.classList.toggle('d-none', !needsSemester);
+                semesterSelect.disabled = !needsSemester;
             }
 
             if (typeSelect) {

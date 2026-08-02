@@ -54,13 +54,21 @@
                                 <td>
                                     <a href="{{ route('data-master.school-years.edit', $year) }}"
                                         class="btn btn-sm btn-outline-primary">Edit</a>
-                                    <form action="{{ route('data-master.school-years.destroy', $year) }}" method="POST"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus tahun ajaran ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                    </form>
+
+                                    @if (!$year->is_active && $year->classes_count == 0)
+                                        <form action="{{ route('data-master.school-years.destroy', $year) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Yakin ingin menghapus tahun ajaran ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                        </form>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-outline-danger" disabled
+                                            title="{{ $year->is_active ? 'Tidak bisa hapus tahun ajaran yang sedang aktif' : 'Tidak bisa hapus, masih ada ' . $year->classes_count . ' kelas terkait' }}">
+                                            Hapus
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

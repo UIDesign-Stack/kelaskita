@@ -13,7 +13,13 @@
                 {{ $reportCard->schoolYear->name ?? '-' }}
             </div>
         </div>
-        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">← Kembali</a>
+        <a href="{{ route('akademik.report-cards.index', [
+                'class_id' => $reportCard->class_id,
+                'semester' => $reportCard->semester,
+                'school_year_id' => $reportCard->school_year_id,
+            ]) }}" class="btn btn-outline-secondary">
+            ← Kembali ke Daftar
+        </a>
     </div>
 
     @if (session('status'))
@@ -63,7 +69,9 @@
                         <tfoot>
                             <tr class="fw-semibold">
                                 <td>Rata-rata Keseluruhan</td>
-                                <td colspan="2">{{ $overallAverage ?? '-' }}</td>
+                                <td colspan="2">
+                                    {{ is_numeric($overallAverage) ? number_format($overallAverage, 1) : '-' }}
+                                </td>
                             </tr>
                         </tfoot>
                     </table>

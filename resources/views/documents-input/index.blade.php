@@ -36,14 +36,18 @@
                         </thead>
                         <tbody>
                             @foreach ($documents as $doc)
+                                @php
+                                    $fileUrl = $doc->fileUrl();
+                                @endphp
                                 <tr>
                                     <td><span class="badge text-bg-primary">{{ $doc->documentType->name ?? '-' }}</span></td>
                                     <td>{{ $doc->title }}</td>
                                     <td>{{ $doc->subject->name ?? '-' }}</td>
                                     <td class="text-capitalize">{{ $doc->semester ?? '-' }}</td>
                                     <td>
-                                        @if ($doc->fileUrl())
-                                            <a href="{{ $doc->fileUrl() }}" target="_blank" class="btn btn-sm btn-outline-primary">Unduh</a>
+                                        @if ($fileUrl)
+                                            <a href="{{ $fileUrl }}" target="_blank" rel="noopener noreferrer"
+                                                class="btn btn-sm btn-outline-primary">Unduh</a>
                                         @else
                                             <span class="text-muted small">-</span>
                                         @endif

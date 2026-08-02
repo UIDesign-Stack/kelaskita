@@ -56,7 +56,9 @@
                             </thead>
                             <tbody>
                                 @foreach ($assignment->schoolClass->students as $student)
-                                    @php $current = $existing[$student->id] ?? 'hadir'; @endphp
+                                    @php
+                                        $current = old('status.' . $student->id, $existing[$student->id] ?? 'hadir');
+                                    @endphp
                                     <tr>
                                         <td>{{ $student->nis }}</td>
                                         <td>{{ $student->name }}</td>

@@ -78,7 +78,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <h6 class="text-muted mb-1">Rata-rata Nilai</h6>
-                    <h3 class="mb-0">{{ $averageScore ?? '-' }}</h3>
+                    <h3 class="mb-0">{{ is_numeric($averageScore) ? number_format($averageScore, 1) : '-' }}</h3>
                 </div>
             </div>
         </div>
@@ -110,6 +110,9 @@
                         </thead>
                         <tbody>
                             @foreach ($grades as $grade)
+                                @php
+                                    $kkm = $grade->subject->kkm ?? 70;
+                                @endphp
                                 <tr>
                                     <td>{{ $grade->student->name ?? '-' }}</td>
                                     <td>{{ $grade->student->schoolClass->name ?? '-' }}</td>
@@ -119,7 +122,7 @@
                                     <td class="text-capitalize">{{ $grade->semester }}</td>
                                     <td>{{ $grade->schoolYear->name ?? '-' }}</td>
                                     <td>
-                                        <span class="fw-semibold {{ $grade->score < 70 ? 'text-danger' : 'text-success' }}">
+                                        <span class="fw-semibold {{ $grade->score < ($grade->subject->kkm ?? 70) ? 'text-danger' : 'text-success' }}">
                                             {{ number_format($grade->score, 1) }}
                                         </span>
                                     </td>

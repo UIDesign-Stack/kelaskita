@@ -11,10 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardService
 {
-    /**
-     * Mapping role => method builder.
-     * Tambah role baru cukup tambah entry di sini.
-     */
     private array $roleBuilders = [
         'wali_kelas' => 'waliKelasStats',
         'guru' => 'guruStats',
@@ -22,15 +18,10 @@ class DashboardService
         'orang_tua' => 'orangTuaStats',
     ];
 
-    /**
-     * Bangun data stats sesuai role yang dimiliki user.
-     * Admin selalu mendapat stats global, role lain digabung
-     * (satu user bisa punya beberapa role sekaligus).
-     */
     public function build(User $user): array
     {
         if ($user->hasRole('admin')) {
-            return ['admin' => $this->adminStats()];
+            return $this->adminStats();
         }
 
         $stats = [];
@@ -79,7 +70,6 @@ class DashboardService
             ];
         }
 
-        // 1 query untuk ambil kedua angka, dibanding 2 query terpisah
         $counts = DB::table('class_subject_teacher')
             ->where('teacher_id', $teacher->id)
             ->selectRaw('COUNT(DISTINCT class_id) as total_classes, COUNT(DISTINCT subject_id) as total_subjects')

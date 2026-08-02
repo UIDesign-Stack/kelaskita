@@ -36,6 +36,16 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="col-md-3">
+                        <label for="kkm" class="form-label">KKM</label>
+                        <input type="number" id="kkm" name="kkm" value="{{ old('kkm', 70) }}" min="0" max="100"
+                            class="form-control @error('kkm') is-invalid @enderror" required>
+                        @error('kkm')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text">Kriteria Ketuntasan Minimal (0-100).</div>
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-end gap-2">

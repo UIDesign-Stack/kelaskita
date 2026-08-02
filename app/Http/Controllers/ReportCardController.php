@@ -8,6 +8,7 @@ use App\Models\ReportCardDetail;
 use App\Models\SchoolClass;
 use App\Models\SchoolYear;
 use App\Models\Student;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,19 +23,19 @@ class ReportCardController extends Controller
         $students = collect();
 
         if ($request->filled('class_id') && $request->filled('semester') && $request->filled('school_year_id')) {
-            
-            $reportCards = ReportCard::where('class_id', $request->class_id)
-                ->where('semester', $request->semester)
+            $students = Student::where('class_id', $request->class_id)
+                ->orderBy('name')
+                ->get();
+
+            $reportCards = ReportCard::where('semester', $request->semester)
                 ->where('school_year_id', $request->school_year_id)
+                ->whereIn('student_id', $students->pluck('id'))
                 ->get()
                 ->keyBy('student_id');
 
-            $students = Student::where('class_id', $request->class_id)
-                ->orderBy('name')
-                ->get()
-                ->each(function ($student) use ($reportCards) {
-                    $student->reportCard = $reportCards->get($student->id);
-                });
+            $students->each(function ($student) use ($reportCards) {
+                $student->reportCard = $reportCards->get($student->id);
+            });
         }
 
         return view('report-cards.index', compact('classes', 'schoolYears', 'students'));
@@ -42,7 +43,7 @@ class ReportCardController extends Controller
 
     public function show(Student $student, Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'semester' => ['required', 'in:ganjil,genap'],
             'school_year_id' => ['required', 'exists:school_years,id'],
         ]);
@@ -50,8 +51,8 @@ class ReportCardController extends Controller
         $reportCard = ReportCard::firstOrCreate(
             [
                 'student_id' => $student->id,
-                'semester' => $validated['semester'],
-                'school_year_id' => $validated['school_year_id'],
+                'semester' => $request->semester,
+                'school_year_id' => $request->school_year_id,
             ],
             [
                 'class_id' => $student->class_id,
@@ -59,15 +60,31 @@ class ReportCardController extends Controller
             ]
         );
 
-        
         if ($reportCard->status === 'draft') {
-            $this->refreshDraftScores($reportCard, $student, $validated);
+            $averages = Grade::where('student_id', $student->id)
+                ->where('semester', $request->semester)
+                ->where('school_year_id', $request->school_year_id)
+                ->select('subject_id', DB::raw('AVG(score) as avg_score'))
+                ->groupBy('subject_id')
+                ->get();
+
+            $kkmMap = Subject::whereIn('id', $averages->pluck('subject_id'))->pluck('kkm', 'id');
+
+            foreach ($averages as $row) {
+                $kkm = $kkmMap[$row->subject_id] ?? 70;
+
+                ReportCardDetail::updateOrCreate(
+                    ['report_card_id' => $reportCard->id, 'subject_id' => $row->subject_id],
+                    [
+                        'final_score' => round($row->avg_score, 1),
+                        'predicate' => $this->predicate($row->avg_score, $kkm),
+                    ]
+                );
+            }
         }
 
         $reportCard->load(['details.subject', 'student', 'schoolYear', 'schoolClass']);
-        $overallAverage = $reportCard->details->isNotEmpty()
-            ? round($reportCard->details->avg('final_score'), 1)
-            : null;
+        $overallAverage = $reportCard->details->isNotEmpty() ? round($reportCard->details->avg('final_score'), 1) : null;
 
         return view('report-cards.show', compact('reportCard', 'overallAverage'));
     }
@@ -89,33 +106,16 @@ class ReportCardController extends Controller
             ->with('status', 'Rapor berhasil difinalisasi dan terkunci.');
     }
 
-    private function refreshDraftScores(ReportCard $reportCard, Student $student, array $filters): void
+    private function predicate(float $score, int $kkm): string
     {
-        $averages = Grade::where('student_id', $student->id)
-            ->where('semester', $filters['semester'])
-            ->where('school_year_id', $filters['school_year_id'])
-            ->select('subject_id', DB::raw('AVG(score) as avg_score'))
-            ->groupBy('subject_id')
-            ->get();
-
-        foreach ($averages as $row) {
-            ReportCardDetail::updateOrCreate(
-                ['report_card_id' => $reportCard->id, 'subject_id' => $row->subject_id],
-                [
-                    'final_score' => round($row->avg_score, 1),
-                    'predicate' => $this->predicate($row->avg_score),
-                ]
-            );
+        if ($score < $kkm) {
+            return 'D';
         }
-    }
 
-    private function predicate(float $score): string
-    {
         return match (true) {
             $score >= 90 => 'A',
             $score >= 80 => 'B',
-            $score >= 70 => 'C',
-            default => 'D',
+            default => 'C',
         };
     }
 }

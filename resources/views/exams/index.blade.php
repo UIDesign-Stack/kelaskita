@@ -4,6 +4,14 @@
 
 @section('content')
 
+    @php
+        $statuses = [
+            'pending'  => ['label' => 'Menunggu',  'color' => 'warning'],
+            'approved' => ['label' => 'Disetujui', 'color' => 'success'],
+            'rejected' => ['label' => 'Ditolak',   'color' => 'danger'],
+        ];
+    @endphp
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Bank Soal Ujian</h4>
         <a href="{{ route('guru.exams.create') }}" class="btn btn-primary">+ Buat Paket Ujian</a>
@@ -36,6 +44,9 @@
                         </thead>
                         <tbody>
                             @foreach ($exams as $exam)
+                                @php
+                                    $examStatus = $statuses[$exam->status] ?? ['label' => ucfirst($exam->status), 'color' => 'secondary'];
+                                @endphp
                                 <tr>
                                     <td>{{ $exam->title }}</td>
                                     <td>{{ $exam->subject->name ?? '-' }}</td>
@@ -43,15 +54,7 @@
                                     <td class="text-uppercase">{{ $exam->type }}</td>
                                     <td>{{ $exam->questions_count }} soal</td>
                                     <td>
-                                        @php
-                                            $statusColor = match($exam->status) {
-                                                'approved' => 'success', 'rejected' => 'danger', default => 'warning',
-                                            };
-                                            $statusLabel = match($exam->status) {
-                                                'approved' => 'Disetujui', 'rejected' => 'Ditolak', default => 'Menunggu',
-                                            };
-                                        @endphp
-                                        <span class="badge text-bg-{{ $statusColor }}">{{ $statusLabel }}</span>
+                                        <span class="badge text-bg-{{ $examStatus['color'] }}">{{ $examStatus['label'] }}</span>
                                         @if ($exam->status === 'rejected' && $exam->rejection_reason)
                                             <div class="text-danger small mt-1">{{ Str::limit($exam->rejection_reason, 60) }}</div>
                                         @endif

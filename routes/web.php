@@ -24,6 +24,9 @@ use App\Http\Controllers\SubstituteTeacherController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\ExamQuestionController;
 use App\Http\Controllers\ExamReviewController;
+use App\Http\Controllers\StudentExamController;
+use App\Http\Controllers\GuruExamResultController;
+use App\Http\Controllers\ExamAnalysisController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -40,9 +43,9 @@ Route::middleware('auth')->group(function () {
     ->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    
+
 });
- 
+
 Route::prefix('data-master')
     ->name('data-master.')
     ->middleware(['auth', 'verified', 'role:admin'])
@@ -53,7 +56,7 @@ Route::prefix('data-master')
         Route::resource('subjects', SubjectController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         Route::resource('school-years', SchoolYearController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         Route::post('classes/{class}/teaching-assignments', [TeachingAssignmentController::class, 'store'])->name('classes.teaching-assignments.store');
-        Route::delete('teaching-assignments/{assignment}', [TeachingAssignmentController::class, 'destroy'])->name('teaching-assignments.destroy');        
+        Route::delete('teaching-assignments/{assignment}', [TeachingAssignmentController::class, 'destroy'])->name('teaching-assignments.destroy');
         Route::resource('document-types', DocumentTypeController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
@@ -91,6 +94,10 @@ Route::prefix('guru')
         Route::post('exams/{exam}/questions', [ExamQuestionController::class, 'store'])->name('exams.questions.store');
         Route::delete('exams/{exam}/questions/{question}', [ExamQuestionController::class, 'destroy'])->name('exams.questions.destroy');
         Route::post('exams/{exam}/resubmit', [ExamController::class, 'resubmit'])->name('exams.resubmit');
+        Route::get('exams/{exam}/results', [GuruExamResultController::class, 'index'])->name('exams.results.index');
+        Route::get('exam-results/{result}/grade', [GuruExamResultController::class, 'grade'])->name('exams.results.grade');
+        Route::post('exam-results/{result}/grade', [GuruExamResultController::class, 'storeGrade'])->name('exams.results.store-grade');
+        Route::get('exams/{exam}/analysis', [ExamAnalysisController::class, 'show'])->name('exams.analysis');
     });
 Route::prefix('presensi')
     ->name('presensi.')
@@ -110,7 +117,7 @@ Route::prefix('wali-kelas')
         Route::post('attendance', [WalasAttendanceController::class, 'store'])->name('attendance.store');
         Route::get('attendance/recap', [WalasAttendanceController::class, 'recap'])->name('attendance.recap');
 });
- 
+
  Route::prefix('ujian')
     ->name('ujian.')
     ->middleware(['auth', 'verified', 'role:admin'])
@@ -120,5 +127,16 @@ Route::prefix('wali-kelas')
         Route::post('exam-review/{exam}/approve', [ExamReviewController::class, 'approve'])->name('exam-review.approve');
         Route::post('exam-review/{exam}/reject', [ExamReviewController::class, 'reject'])->name('exam-review.reject');
     });
+
+Route::prefix('siswa')
+->name('siswa.')
+->middleware(['auth', 'verified', 'role:siswa'])
+->group(function () {
+    Route::get('exams', [StudentExamController::class, 'index'])->name('exams.index');
+    Route::post('exams/{exam}/start', [StudentExamController::class, 'start'])->name('exams.start');
+    Route::get('exam-results/{result}/take', [StudentExamController::class, 'take'])->name('exams.take');
+    Route::post('exam-results/{result}/submit', [StudentExamController::class, 'submit'])->name('exams.submit');
+    Route::get('exam-results/{result}', [StudentExamController::class, 'result'])->name('exams.result');
+});
 
 require __DIR__.'/auth.php';

@@ -62,7 +62,8 @@
                                     <td>{{ $material->created_at->translatedFormat('d M Y') }}</td>
                                     <td>
                                         @if ($material->fileUrl())
-                                            <a href="{{ $material->fileUrl() }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <a href="{{ $material->fileUrl() }}" target="_blank" rel="noopener noreferrer"
+                                                class="btn btn-sm btn-outline-primary">
                                                 Unduh
                                             </a>
                                         @else
