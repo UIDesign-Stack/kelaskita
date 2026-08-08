@@ -18,6 +18,14 @@ class Teacher extends Model
         return $this->hasMany(SchoolClass::class, 'homeroom_teacher_id');
     }
 
+    public function activeHomeroomClass(): ?SchoolClass
+    {
+        return $this->homeroomClasses()
+            ->whereHas('schoolYear', fn ($q) => $q->where('is_active', true))
+            ->with('students')
+            ->first();
+    }
+
     public function teachingAssignments()
     {
         return $this->hasMany(ClassSubjectTeacher::class);

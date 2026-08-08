@@ -28,7 +28,6 @@ class ViolationController extends Controller
 
         $violations = $query->latest('date')->get();
 
-        // Rekap total poin per siswa (buat identifikasi siswa dengan poin tertinggi)
         $topStudents = $violations->groupBy('student_id')
             ->map(fn ($group) => [
                 'student' => $group->first()->student,

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 class StoreWalasAttendanceRequest extends FormRequest
 {
     private ?SchoolClass $homeroomClass = null;
+    private bool $resolved = false;
 
     public function authorize(): bool
     {
@@ -47,18 +48,12 @@ class StoreWalasAttendanceRequest extends FormRequest
 
     public function resolveHomeroomClass(): ?SchoolClass
     {
-        if ($this->homeroomClass) {
-            return $this->homeroomClass;
+        if (! $this->resolved) {
+            $teacher = Auth::user()->teacher;
+            $this->homeroomClass = $teacher?->activeHomeroomClass();
+            $this->resolved = true;
         }
 
-        $teacher = Auth::user()->teacher;
-
-        if (! $teacher) {
-            return null;
-        }
-
-        return $this->homeroomClass = $teacher->homeroomClasses()
-            ->whereHas('schoolYear', fn ($q) => $q->where('is_active', true))
-            ->first();
+        return $this->homeroomClass;
     }
 }

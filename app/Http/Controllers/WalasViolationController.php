@@ -16,7 +16,7 @@ class WalasViolationController extends Controller
 
         if ($class) {
             $violations = Violation::with('student')
-                ->whereIn('student_id', $class->students()->pluck('id'))
+                ->whereHas('student', fn ($q) => $q->where('class_id', $class->id))
                 ->latest('date')
                 ->get();
         }
@@ -73,8 +73,6 @@ class WalasViolationController extends Controller
 
     private function homeroomClass()
     {
-        $teacher = Auth::user()->teacher;
-
-        return $teacher ? $teacher->homeroomClasses()->first() : null;
+        return Auth::user()->teacher?->activeHomeroomClass();
     }
 }

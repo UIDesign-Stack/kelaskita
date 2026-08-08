@@ -98,15 +98,6 @@ class WalasAttendanceController extends Controller
 
     private function homeroomClass(): ?SchoolClass
     {
-        $teacher = Auth::user()->teacher;
-
-        if (! $teacher) {
-            return null;
-        }
-
-        return $teacher->homeroomClasses()
-            ->whereHas('schoolYear', fn ($q) => $q->where('is_active', true))
-            ->with('students')
-            ->first();
+        return Auth::user()->teacher?->activeHomeroomClass();
     }
 }
