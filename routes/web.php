@@ -33,6 +33,7 @@ use App\Http\Controllers\AchievementController;
 use App\Http\Controllers\WalasAchievementController;
 use App\Http\Controllers\WalasCommunicationController;
 use App\Http\Controllers\ParentCommunicationController;
+use App\Http\Controllers\CounselingNoteController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -154,6 +155,7 @@ Route::prefix('perilaku')
     ->group(function () {
         Route::get('violations', [ViolationController::class, 'index'])->name('violations.index');
         Route::get('achievements', [AchievementController::class, 'index'])->name('achievements.index');
+        Route::resource('counseling-notes', CounselingNoteController::class)->only(['index', 'create', 'store', 'destroy']);
 });
 
 

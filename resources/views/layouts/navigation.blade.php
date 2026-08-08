@@ -45,7 +45,7 @@
                 'Pelanggaran' => route('perilaku.violations.index'),
                 'Prestasi' => route('perilaku.achievements.index'),
                 'Buku Penghubung' => route('wali-kelas.communication-logs.index'),
-                'Catatan BK' => '#',
+                'Catatan BK' => route('perilaku.counseling-notes.index'),
                 'Profil Kesehatan' => '#',
                 'Minat & Bakat' => '#',
             ],
