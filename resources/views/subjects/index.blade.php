@@ -48,13 +48,21 @@
                                 <td>
                                     <a href="{{ route('data-master.subjects.edit', $subject) }}"
                                         class="btn btn-sm btn-outline-primary">Edit</a>
-                                    <form action="{{ route('data-master.subjects.destroy', $subject) }}" method="POST"
-                                        class="d-inline"
-                                        onsubmit="return confirm('Yakin ingin menghapus mata pelajaran ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                    </form>
+
+                                    @if ($subject->class_subject_teachers_count == 0)
+                                        <form action="{{ route('data-master.subjects.destroy', $subject) }}" method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Yakin ingin menghapus mata pelajaran ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                        </form>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-outline-danger" disabled
+                                            title="Tidak bisa hapus, masih dipakai di {{ $subject->class_subject_teachers_count }} penugasan mengajar">
+                                            Hapus
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

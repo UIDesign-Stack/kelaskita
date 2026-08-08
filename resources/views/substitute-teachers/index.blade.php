@@ -57,8 +57,6 @@
                             @endforeach
                         </tbody>
                     </table>
-
-                    {{ $logs->links() }}
                 </div>
             @endif
         </div>

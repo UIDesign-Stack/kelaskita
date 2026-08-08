@@ -54,7 +54,9 @@
                             </thead>
                             <tbody>
                                 @foreach ($teachers as $teacher)
-                                    @php $current = $existing[$teacher->id] ?? 'hadir'; @endphp
+                                    @php
+                                        $current = old('status.' . $teacher->id, $existing[$teacher->id] ?? 'hadir');
+                                    @endphp
                                     <tr>
                                         <td>{{ $teacher->user->name ?? '-' }}</td>
                                         @foreach (['hadir', 'izin', 'sakit', 'alpa'] as $option)

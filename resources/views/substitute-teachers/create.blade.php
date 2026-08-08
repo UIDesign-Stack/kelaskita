@@ -11,7 +11,7 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form method="POST" action="{{ route('presensi.substitute-teachers.store') }}">
+            <form method="POST" action="{{ route('presensi.substitute-teachers.store') }}" id="substitute-form">
                 @csrf
 
                 <div class="row g-3 mb-4">
@@ -45,6 +45,9 @@
                         @error('substitute_teacher_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <div class="invalid-feedback" id="same-teacher-feedback">
+                            Guru pengganti tidak boleh sama dengan guru yang digantikan.
+                        </div>
                     </div>
 
                     <div class="col-md-4">
@@ -108,3 +111,29 @@
     </div>
 
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('substitute-form');
+            const original = document.getElementById('original_teacher_id');
+            const substitute = document.getElementById('substitute_teacher_id');
+
+            function validateDifferentTeacher() {
+                const isSame = original.value !== '' && original.value === substitute.value;
+                substitute.setCustomValidity(isSame ? 'Guru pengganti tidak boleh sama dengan guru yang digantikan.' : '');
+                substitute.classList.toggle('is-invalid', isSame);
+                return !isSame;
+            }
+
+            original.addEventListener('change', validateDifferentTeacher);
+            substitute.addEventListener('change', validateDifferentTeacher);
+
+            form.addEventListener('submit', function (e) {
+                if (!validateDifferentTeacher()) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+@endpush

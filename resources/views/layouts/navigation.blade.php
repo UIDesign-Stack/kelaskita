@@ -42,9 +42,9 @@
                 'Analisis Butir Soal' => '#',
             ],
             'Perilaku & Bimbingan' => [
-                'Pelanggaran' => '#',
-                'Prestasi' => '#',
-                'Buku Penghubung' => '#',
+                'Pelanggaran' => route('perilaku.violations.index'),
+                'Prestasi' => route('perilaku.achievements.index'),
+                'Buku Penghubung' => route('wali-kelas.communication-logs.index'),
                 'Catatan BK' => '#',
                 'Profil Kesehatan' => '#',
                 'Minat & Bakat' => '#',
@@ -89,8 +89,8 @@
                 'Rapor Digital' => '#',
             ],
             'Perilaku & Bimbingan' => [
-                'Pelanggaran' => '#',
-                'Prestasi' => '#',
+                'Pelanggaran' => route('wali-kelas.violations.index'),
+                'Prestasi' => route('wali-kelas.achievements.index'),
                 'Buku Penghubung' => '#',
                 'Profil Kesehatan' => '#',
                 'Minat & Bakat' => '#',
@@ -167,7 +167,7 @@
             ],
             'Administrasi' => [
                 'Ajukan Surat Izin' => '#',
-                'Buku Penghubung' => '#',
+                'Buku Penghubung' => route('orang-tua.communication-logs.index'),
                 'Kas & SPP' => '#',
             ],
             'Komunikasi' => [

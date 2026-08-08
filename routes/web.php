@@ -27,6 +27,12 @@ use App\Http\Controllers\ExamReviewController;
 use App\Http\Controllers\StudentExamController;
 use App\Http\Controllers\GuruExamResultController;
 use App\Http\Controllers\ExamAnalysisController;
+use App\Http\Controllers\ViolationController;
+use App\Http\Controllers\WalasViolationController;
+use App\Http\Controllers\AchievementController;
+use App\Http\Controllers\WalasAchievementController;
+use App\Http\Controllers\WalasCommunicationController;
+use App\Http\Controllers\ParentCommunicationController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -116,6 +122,9 @@ Route::prefix('wali-kelas')
         Route::get('attendance', [WalasAttendanceController::class, 'index'])->name('attendance.index');
         Route::post('attendance', [WalasAttendanceController::class, 'store'])->name('attendance.store');
         Route::get('attendance/recap', [WalasAttendanceController::class, 'recap'])->name('attendance.recap');
+        Route::resource('violations', WalasViolationController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::resource('achievements', WalasAchievementController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::resource('communication-logs', WalasCommunicationController::class)->only(['index', 'create', 'store']);
 });
 
  Route::prefix('ujian')
@@ -137,6 +146,23 @@ Route::prefix('siswa')
     Route::get('exam-results/{result}/take', [StudentExamController::class, 'take'])->name('exams.take');
     Route::post('exam-results/{result}/submit', [StudentExamController::class, 'submit'])->name('exams.submit');
     Route::get('exam-results/{result}', [StudentExamController::class, 'result'])->name('exams.result');
+});
+
+Route::prefix('perilaku')
+    ->name('perilaku.')
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->group(function () {
+        Route::get('violations', [ViolationController::class, 'index'])->name('violations.index');
+        Route::get('achievements', [AchievementController::class, 'index'])->name('achievements.index');
+});
+
+
+Route::prefix('orang-tua')
+    ->name('orang-tua.')
+    ->middleware(['auth', 'verified', 'role:orang_tua'])
+    ->group(function () {
+        Route::get('communication-logs', [ParentCommunicationController::class, 'index'])->name('communication-logs.index');
+        Route::post('communication-logs/{log}/reply', [ParentCommunicationController::class, 'reply'])->name('communication-logs.reply');
 });
 
 require __DIR__.'/auth.php';

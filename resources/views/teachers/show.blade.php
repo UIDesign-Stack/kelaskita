@@ -16,8 +16,16 @@
         <div class="col-md-4">
             <div class="card shadow-sm border-0">
                 <div class="card-body text-center">
-                    <img src="{{ $teacher->photoUrl() }}" alt="{{ $teacher->user->name ?? '-' }}"
-                        class="rounded-circle mb-3" width="110" height="110" style="object-fit: cover;">
+                    @php $photoUrl = $teacher->photoUrl(); @endphp
+                    @if ($photoUrl)
+                        <img src="{{ $photoUrl }}" alt="{{ $teacher->user->name ?? '-' }}"
+                            class="rounded-circle mb-3" width="110" height="110" style="object-fit: cover;">
+                    @else
+                        <div class="rounded-circle bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center fw-semibold mx-auto mb-3"
+                            style="width: 110px; height: 110px; font-size: 2.5rem;">
+                            {{ strtoupper(substr($teacher->user->name ?? '?', 0, 1)) }}
+                        </div>
+                    @endif
 
                     <h5 class="mb-1">{{ $teacher->user->name ?? '-' }}</h5>
                     <div class="text-muted small mb-2">{{ $teacher->specialization ?? 'Belum ada spesialisasi' }}</div>

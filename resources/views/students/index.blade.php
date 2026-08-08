@@ -4,6 +4,15 @@
 
 @section('content')
 
+    @php
+        $studentStatuses = [
+            'aktif' => 'success',
+            'pindah' => 'secondary',
+            'lulus' => 'primary',
+            'keluar' => 'danger',
+        ];
+    @endphp
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Data Siswa</h4>
         <a href="{{ route('data-master.students.create') }}" class="btn btn-primary">
@@ -29,10 +38,18 @@
                     </thead>
                     <tbody>
                         @foreach ($students as $student)
+                            @php $photoUrl = $student->photoUrl(); @endphp
                             <tr>
                                 <td>
-                                    <img src="{{ $student->photoUrl() }}" alt="{{ $student->name }}"
-                                        class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                                    @if ($photoUrl)
+                                        <img src="{{ $photoUrl }}" alt="{{ $student->name }}"
+                                            class="rounded-circle" width="36" height="36" style="object-fit: cover;">
+                                    @else
+                                        <div class="rounded-circle bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center fw-semibold"
+                                            style="width: 36px; height: 36px;" title="{{ $student->name }}">
+                                            {{ strtoupper(substr($student->name, 0, 1)) }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>{{ $student->nis }}</td>
                                 <td>{{ $student->nisn ?? '-' }}</td>
@@ -40,7 +57,9 @@
                                 <td>{{ $student->schoolClass->name ?? '-' }}</td>
                                 <td>{{ $student->gender === 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
                                 <td>
-                                    <span class="badge text-bg-success text-capitalize">{{ $student->status }}</span>
+                                    <span class="badge text-bg-{{ $studentStatuses[$student->status] ?? 'secondary' }} text-capitalize">
+                                        {{ $student->status }}
+                                    </span>
                                 </td>
                                 <td>
                                     <a href="{{ route('data-master.students.show', $student) }}" class="btn btn-sm btn-outline-secondary">Detail</a>

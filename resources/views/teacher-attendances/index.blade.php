@@ -4,6 +4,15 @@
 
 @section('content')
 
+    @php
+        $statuses = [
+            'hadir' => ['label' => 'Hadir', 'color' => 'success'],
+            'izin'  => ['label' => 'Izin',  'color' => 'primary'],
+            'sakit' => ['label' => 'Sakit', 'color' => 'warning'],
+            'alpa'  => ['label' => 'Alpa',  'color' => 'danger'],
+        ];
+    @endphp
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Absensi Guru</h4>
         <a href="{{ route('presensi.teacher-attendances.create') }}" class="btn btn-primary">
@@ -33,10 +42,11 @@
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
                         <option value="">Semua</option>
-                        <option value="hadir" @selected(request('status') == 'hadir')>Hadir</option>
-                        <option value="izin" @selected(request('status') == 'izin')>Izin</option>
-                        <option value="sakit" @selected(request('status') == 'sakit')>Sakit</option>
-                        <option value="alpa" @selected(request('status') == 'alpa')>Alpa</option>
+                        @foreach ($statuses as $value => $status)
+                            <option value="{{ $value }}" @selected(request('status') == $value)>
+                                {{ $status['label'] }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -47,26 +57,16 @@
     </div>
 
     <div class="row g-3 mb-3">
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Hadir</h6><h3 class="mb-0 text-success">{{ $summary['hadir'] }}</h3>
-            </div></div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Izin</h6><h3 class="mb-0 text-primary">{{ $summary['izin'] }}</h3>
-            </div></div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Sakit</h6><h3 class="mb-0 text-warning">{{ $summary['sakit'] }}</h3>
-            </div></div>
-        </div>
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0"><div class="card-body">
-                <h6 class="text-muted mb-1">Alpa</h6><h3 class="mb-0 text-danger">{{ $summary['alpa'] }}</h3>
-            </div></div>
-        </div>
+        @foreach ($statuses as $value => $status)
+            <div class="col-md-3">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h6 class="text-muted mb-1">{{ $status['label'] }}</h6>
+                        <h3 class="mb-0 text-{{ $status['color'] }}">{{ $summary[$value] ?? 0 }}</h3>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
 
     <div class="card shadow-sm border-0">
@@ -86,24 +86,20 @@
                         </thead>
                         <tbody>
                             @foreach ($records as $record)
+                                @php
+                                    $recordStatus = $statuses[$record->status] ?? ['label' => ucfirst($record->status), 'color' => 'secondary'];
+                                @endphp
                                 <tr>
                                     <td>{{ $record->date->translatedFormat('d M Y') }}</td>
                                     <td>{{ $record->teacher->user->name ?? '-' }}</td>
                                     <td>
-                                        @php
-                                            $badgeColor = match($record->status) {
-                                                'hadir' => 'success', 'izin' => 'primary',
-                                                'sakit' => 'warning', 'alpa' => 'danger', default => 'secondary',
-                                            };
-                                        @endphp
-                                        <span class="badge text-bg-{{ $badgeColor }} text-capitalize">{{ $record->status }}</span>
+                                        <span class="badge text-bg-{{ $recordStatus['color'] }} text-capitalize">{{ $recordStatus['label'] }}</span>
                                     </td>
                                     <td>{{ $record->notes ?? '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
-                    {{ $records->links() }}
                 </div>
             @endif
         </div>
